@@ -1,15 +1,15 @@
 (function ($) {
 
     var contacts = [
-        { name: "Contact 1", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "family" },
-        { name: "Contact 2", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "family" },
-        { name: "Contact 3", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "friend" },
-        { name: "Contact 4", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "colleague" },
-        { name: "Contact 5", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "family" },
-        { name: "Contact 6", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "colleague" },
-        { name: "Contact 7", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "friend" },
-        { name: "Contact 7", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "friend" },
-        { name: "Contact 8", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "family" }
+        { name: "Contact 1", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Family" },
+        { name: "Contact 2", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Family" },
+        { name: "Contact 3", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Friends" },
+        { name: "Contact 4", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Colleagues" },
+        { name: "Contact 5", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Family" },
+        { name: "Contact 6", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Colleagues" },
+        { name: "Contact 7", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Friends" },
+        { name: "Contact 7", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Friends" },
+        { name: "Contact 8", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Family" }
     ];
 
     //define the contact model
@@ -58,7 +58,6 @@
             var that = this;
 
            this.$el.find("article.contact-container").remove();
-               
 
             _.each(this.collection.models, function (item) {
                 that.renderContact(item);
@@ -76,15 +75,12 @@
         },
         createSelect: function () {
             var filter = this.$el.find("#filter"),
-                select = $("<select/>", {
-                    html: "<option value='all'>All</option>"
+                select = $("<div/>", {
+                    html: "<a href='#filter/all' data='all'>All</a><br/><br/>"
                 });
-            
             _.each(this.getTypes(), function (item) {
-                var option = $("<option/>", {
-                    value: item.toLowerCase(),
-                    text: item.toLowerCase()
-                }).appendTo(select);
+                var option = $("<a href='#filter/" + item.toLowerCase() +"'>" 
+                    + item + "</a><br/><br/>").appendTo(select);
             });
             return select;
         },
@@ -106,11 +102,10 @@
                 contactsRouter.navigate("filter/all");
             } else {
                 this.collection.reset(contacts, {silent: true});
-
-                var filterType = this.filterType;
-                var filtered = _.filter(this.collection.models, function (item) {
-                    return item.get("type").toLowerCase() === filterType;
-                });
+                var filterType = this.filterType,
+                    filtered = _.filter(this.collection.models, function (item) {
+                        return item.get("type").toLowerCase() === filterType;
+                    });
                 this.collection.reset(filtered);
                 contactsRouter.navigate("filter/" + filterType);
             }
