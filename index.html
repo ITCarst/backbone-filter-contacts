@@ -10,19 +10,43 @@
 
         <div class="flex-container" id="content">
 
-            <header role="banner">
-            
-               Add new contact:<br/>
+            <header role="banner">Header</header>
 
-            
-            
-            </header>
             <main class="flex-container flex-content">
-            
+                <div class="add-contact">
+                    <div>
+                        Add Contact:<br/>
+                        <form id="addContact" action="#">
+                            <label for="photo">Photo:</label><br/>
+                            <input id="photo" type="file"/>
+
+                            <label for="type">Type:</label><br/>
+                            <input id="type" type="text"/>
+
+                            <label for="name">Name: </label><br/>
+                             <input id="name" type="text"/>
+
+                             <label for="address">Address:</label><br/>
+                            <input id="address" type="text"/>
+
+                            <label for="tel">Tel:</label><br/>
+                            <input id="tel" type="text"/>
+
+                            <label for="email">Email:</label><br/>
+                            <input id="email" type="text"/>
+
+                            <button id="add">Add</button>
+
+                        </form>
+                    </div>
+                </div>
+
                 <nav class="mailbox-list">
                      <div id="filter"><label>Show me: </label></div>
                 </nav>
-            
+
+                
+
                 <article class="message">
                     <div id="contacts">
                         <script id="contactTemplate" type="text/template">

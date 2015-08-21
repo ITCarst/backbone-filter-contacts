@@ -53,6 +53,10 @@
             //add change event on select that will fiter the contacts
             this.on("change:filterType", this.filterByType, false);
             this.collection.on("reset", this.render, this);
+
+            //render the collection with the new contact
+            this.collection.on("add", this.renderContact, this);
+
         },
         render: function () {
             var that = this;
@@ -89,7 +93,8 @@
             $(flexContainer).append(this.createSelect());
         },
         events: {
-            "change #filter select" : "setFilter"
+            "change #filter select" : "setFilter",
+            "click #add" : "addContact"
         },
         setFilter: function(e) {
             this.filterType = e.currentTarget.value;
@@ -108,6 +113,30 @@
                     });
                 this.collection.reset(filtered);
                 contactsRouter.navigate("filter/" + filterType);
+            }
+        },
+        addContact: function (e) {
+            e.preventDefault();
+
+            var newModel = {};
+
+            $("#addContact").children("input").each(function (i, el){
+                if ($(el).val() !== "")
+                    newModel[el.id] = $(el).val();
+            });
+            
+            if (!_.isEmpty(newModel)) {
+
+                contacts.push(newModel);
+
+                if (_.indexOf(this.getTypes(), newModel.type) === -1) {
+                    this.collection.add(new Contact(newModel));
+                    this.$el.find("#filter").find("select").remove().end().append(this.createSelect());
+                }  else {
+                    this.collection.add(new Contact(newModel));
+                }
+            } else {
+                alert("fill in the form pls");
             }
         }
     });

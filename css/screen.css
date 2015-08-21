@@ -17,7 +17,7 @@ html, body {
 }
 
 header, footer {
-    padding: 2rem;
+    padding: 2rem 0;
 }
 
 header {
@@ -32,6 +32,7 @@ header {
     -webkit-justify-content: flex-start;
     justify-content: flex-start;
     height: 98vh;
+    flex:1;
 }
     .flex-content {
         -webkit-flex-direction: row;
@@ -41,16 +42,21 @@ header {
         -webkit-flex-basis: 100%;
         flex-basis: 100%;
     }
-
-
 .mailbox-list {
-    flex-basis: 20%;
-    -webkit-flex-basis: 20%;
+    flex-basis: 15%;
+    -webkit-flex-basis: 15%;
     border-right: 1px solid #fff;
-    padding-left: 2em;
     padding-top: 2em;
 }
 
+.add-contact {
+    flex-basis: 20%;
+    -webkit-flex-basis: 20%;
+}
+.add-contact div {
+    padding-top: 2em;
+    padding-left: 1em;
+}
 .mailbox-list {
     background:#eee;
 }
