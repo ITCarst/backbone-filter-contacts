@@ -1,4 +1,5 @@
 (function ($) {
+    var footerLinks = ["about", "contact", "similar"];
 
     var contacts = [
         { name: "Contact 1", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Family" },
@@ -15,9 +16,38 @@
     //define the contact model
     var Contact = Backbone.Model.extend({
         defaults: {
-            photo : "./img/placeholder.png" //default image for contacts
+            photo : "./img/placeholder.png", //default image for contacts
+            name : "",
+            tel : "",
+            email: "",
+            type: ""
          }
     });
+
+    var Footer = Backbone.Model.extend();
+    var FooterDir = Backbone.Collection.extend({
+        model: Footer
+    });
+    
+    var FooterView = Backbone.View.extend({
+        el: $("#footer"),
+
+        initialize: function () {
+            this.collection = new FooterDir(footerLinks);
+
+            this.render();
+        },
+        render : function () {
+            var that = this;
+            _.each(this.collection.models, function (link) {
+                that.renderFooterLinks(link);
+            });
+        },
+        renderFooterLinks: function (link) {
+            console.log(link);              
+        }
+    });
+
 
     //define collection dir
     var Directory = Backbone.Collection.extend({
@@ -33,10 +63,18 @@
         render: function () {
             var tmpl = _.template(this.template);
             this.$el.html(tmpl(this.model.toJSON()));
-
             return this;
-
-        }
+        },
+        events: {
+            "click button.delete" : "deleteContact"
+        },
+        deleteContact: function () {
+            var removedType = this.model.get("type").toLowerCase();
+            this.model.destroy();
+            this.remove();
+            if(_.indexOf(directory.getTypes(), removedType) === -1) 
+                directory.$el.find("#filter div").children("a[data='" + removedType + "']").remove();
+        }   
     });
 
     //master view
@@ -56,6 +94,8 @@
 
             //render the collection with the new contact
             this.collection.on("add", this.renderContact, this);
+            
+            this.collection.on("remove", this.removeContact, this);
 
         },
         render: function () {
@@ -83,7 +123,7 @@
                     html: "<a href='#filter/all' data='all'>All</a><br/><br/>"
                 });
             _.each(this.getTypes(), function (item) {
-                var option = $("<a href='#filter/" + item.toLowerCase() +"'>" 
+                var option = $("<a href='#filter/" + item.toLowerCase() +"' data='" + item.toLowerCase() + "'>" 
                     + item + "</a><br/><br/>").appendTo(select);
             });
             return select;
@@ -94,7 +134,8 @@
         },
         events: {
             "change #filter select" : "setFilter",
-            "click #add" : "addContact"
+            "click #add" : "addContact",
+            "click #showForm": "showForm"
         },
         setFilter: function(e) {
             this.filterType = e.currentTarget.value;
@@ -126,9 +167,7 @@
             });
             
             if (!_.isEmpty(newModel)) {
-
                 contacts.push(newModel);
-
                 if (_.indexOf(this.getTypes(), newModel.type) === -1) {
                     this.collection.add(new Contact(newModel));
                     this.$el.find("#filter").find("select").remove().end().append(this.createSelect());
@@ -138,6 +177,19 @@
             } else {
                 alert("fill in the form pls");
             }
+        },
+        removeContact: function (removeModel) {
+            var removed = removeModel.attributes;
+            if(removed.photo === "/img/placeholder.png")
+                delete removed.photo;
+
+            _.each(contacts, function (contact) {
+                if (_.isEqual(contact, removed))
+                    contacts.splice(_.indexOf(contacts, contact), 1);
+            });
+        },
+        showForm : function () {
+            this.$el.find(".add-contact > div").slideToggle();           
         }
     });
 
@@ -153,6 +205,9 @@
             directory.trigger("change:filterType");
         }
     });
+
+
+    var footer = new FooterView();
 
     //create the router init
     var contactsRouter = new ContactsRouter();

@@ -102,7 +102,11 @@ header {
     font-size:10px;
     float:right;
 }
-
-
+.contact-container .delete {
+    float: right;
+}
+.add-contact > div {
+    display: none;
+}
 
 
