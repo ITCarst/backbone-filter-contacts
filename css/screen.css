@@ -102,6 +102,7 @@ header {
     font-size:10px;
     float:right;
 }
+.contact-container .edit,
 .contact-container .delete {
     float: right;
 }

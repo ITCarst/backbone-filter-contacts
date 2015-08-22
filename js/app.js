@@ -1,5 +1,5 @@
 (function ($) {
-    var footerLinks = ["about", "contact", "similar"];
+    var footerLinks = [{name: "about"}, {name: "contact"}, {name: "similar"}];
 
     var contacts = [
         { name: "Contact 1", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Family" },
@@ -25,6 +25,18 @@
     });
 
     var Footer = Backbone.Model.extend();
+
+    var FooterTpl = Backbone.View.extend({
+        tagName: "li",
+        className: "footerLinks",
+        template: $("#footerTemplate").html(),
+        
+        render : function () {
+            var tmpl = _.template(this.template);
+            this.$el.html(tmpl(this.model.toJSON()));
+            return this;
+        }
+    });
     var FooterDir = Backbone.Collection.extend({
         model: Footer
     });
@@ -34,20 +46,22 @@
 
         initialize: function () {
             this.collection = new FooterDir(footerLinks);
-
             this.render();
         },
         render : function () {
             var that = this;
-            _.each(this.collection.models, function (link) {
-                that.renderFooterLinks(link);
+            _.each(this.collection.models, function (item) {
+                that.renderFooterLinks(item);
             });
         },
-        renderFooterLinks: function (link) {
-            console.log(link);              
+        renderFooterLinks: function (item) {
+            var footerTpl = new FooterTpl({
+                model : item
+            });
+          this.$el.find("ul").append(footerTpl.render().el);
+
         }
     });
-
 
     //define collection dir
     var Directory = Backbone.Collection.extend({
@@ -59,14 +73,21 @@
         tagName : "article",
         className: "contact-container",
         template: $("#contactTemplate").html(),
+        editTemplate : _.template($("#contactEditTemplate").html()),
 
         render: function () {
             var tmpl = _.template(this.template);
             this.$el.html(tmpl(this.model.toJSON()));
+
+
             return this;
         },
         events: {
-            "click button.delete" : "deleteContact"
+            "click button.delete" : "deleteContact",
+            "click button.edit" : "editContact",
+            "change select.type" : "addType",
+            "click button.save" : "saveEdits",
+            "click button.cancel" : "cancelEdit"
         },
         deleteContact: function () {
             var removedType = this.model.get("type").toLowerCase();
@@ -74,7 +95,33 @@
             this.remove();
             if(_.indexOf(directory.getTypes(), removedType) === -1) 
                 directory.$el.find("#filter div").children("a[data='" + removedType + "']").remove();
-        }   
+        },
+        editContact: function () {
+            this.$el.html(this.editTemplate(this.model.toJSON()));
+            
+            var newOpt = $("<option", {
+                html : "<em>Add new..</em>",
+                value: "addType"
+            });
+
+            this.select = directory.createSelectDropDown().addClass("type")
+                .val(this.$el.find("#type").val()).append(newOpt)
+                .insertAfter(this.$el.find(".name"));
+
+            console.log(newOpt);
+
+            this.$el.find("input[type='hidden']").remove();
+
+        },
+        addType: function () {
+                     
+        },
+        saveEdits: function () {
+                   
+        },
+        cancelEdit: function () {
+                         
+        }
     });
 
     //master view
@@ -126,6 +173,20 @@
                 var option = $("<a href='#filter/" + item.toLowerCase() +"' data='" + item.toLowerCase() + "'>" 
                     + item + "</a><br/><br/>").appendTo(select);
             });
+            return select;
+        },
+        createSelectDropDown: function () {
+            var select = $("<select/>", {
+                html : "<option value='all'>All</option>"
+            });
+
+            _.each(this.getTypes(), function (item) {
+                var option = $("<option/>", {
+                    value: item.toLowerCase(),
+                    text:item.toLowerCase()
+                }).appendTo(select);
+            });
+
             return select;
         },
         renderSelect: function () {
