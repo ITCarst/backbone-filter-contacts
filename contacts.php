@@ -21,7 +21,8 @@ class contactManager
    {
        $data = mysqli_connect('localhost:8889', 'root', 'root', "backbone_contacts");
        
-       if ($data->connect_errno) {
+       if ($data->connect_errno) 
+       {
            printf("Connection failed: %s\n" , $data->connection_errno);
            exit();
        }
@@ -32,23 +33,52 @@ class contactManager
     private function dbData () 
     {
 
-       echo "<pre>";
+        $db = $this->dbResponse;
+        $resultArray = [];
 
-       if ($_SERVER["REQUEST_METHOD"] == "GET")
-           echo "we got get";
-        
-        
+        if ($_SERVER["REQUEST_METHOD"] == "GET") 
+        {
+           switch($_SERVER["REQUEST_METHOD"]) 
+           {
+                case "GET":
+                    $arg = $_GET;
 
+                    if($arg["c"]) {
+                        //select all query
+                        $selectAll = "SELECT name, address, tel, type, email FROM contacts";
 
-/*
-        switch ($_SERVER["REQUEST_METHOD"]) {
-            case "GET": 
-                brake; 
-            case "POST":
-                brake;
-            default:
-                echo "bla";
- */
+                        //get all the entries from db
+                        if ($result = mysqli_query($db, $selectAll)) 
+                        {
+                            while ($row = $result->fetch_assoc()) 
+                            {
+                                if (!empty($row)) 
+                                    $resultArray[] = $row;
+                            }
+                            echo json_encode($resultArray);
+
+                        } else {
+                            echo "No results found";
+                        }
+                    }
+                    break;
+
+                case "POST":
+                    print_r($_POST);
+                    break;
+
+                case "DELETE":
+                    print_r("delete");
+                    break;
+
+                case "PUT":
+                    print_r("insert");
+                    break;
+
+                default:
+                    echo "get all";
+           } 
+       }
             
     }
 

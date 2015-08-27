@@ -2,40 +2,49 @@
     //enable backbone ajax
     Backbone.emulateHTTP = true;
     Backbone.emulateJSON = true;
+
     //footer links array
     var footerLinks = [{name: "about"}, {name: "contact"}, {name: "similar"}];
+    
     //static contacts data
-    var contacts = [
+ /*   var contacts = [
         { name: "Contact 1", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Family" },
-        { name: "Contact 2", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Family" },
-        { name: "Contact 3", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Friends" },
-        { name: "Contact 4", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Colleagues" },
-        { name: "Contact 5", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Family" },
-        { name: "Contact 6", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Colleagues" },
-        { name: "Contact 7", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Friends" },
-        { name: "Contact 7", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Friends" },
-        { name: "Contact 8", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Family" }
+        { id: 2, name: "Contact 2", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Family" },
+        { id: 3, name: "Contact 3", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Friends" },
+        { id: 4, name: "Contact 4", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Colleagues" },
+        { id: 5, name: "Contact 5", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Family" },
+        { id: 6, name: "Contact 6", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Colleagues" },
+        { id: 7, name: "Contact 7", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Friends" },
+        { id: 8, name: "Contact 7", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Friends" },
+        { id: 9, name: "Contact 8", address: "1, a street, a town, a city, AB12 3CD", tel: "0123456789", email: "anemail@me.com", type: "Family" }
     ];
-
+*/
     //define the contact model
     var Contact = Backbone.Model.extend({
-        defaults: {
+         defaults: {
             photo : "./img/placeholder.png", //default image for contacts
             name : "",
             tel : "",
             email: "",
             type: ""
-         },
-        urlRoot: "/contacts.php",
+        }
     });
 
     //define collection dir
-    var Directory = Backbone.Collection.extend({
-        model: Contact
+    var ContactsList = Backbone.Collection.extend({
+        model: Contact,
+        urlRoot : "./contacts.php",
+        url: function () {
+            var base = this.urlRoot || (this.collection && this.collection.url) || "/";
+            return base;
+        },
+        initialize: function () {
+        
+        }
     });
 
-    //Views
-    var ContactView = Backbone.View.extend({
+    //contacts view tempalte with the data from the array
+    var ContactItem = Backbone.View.extend({
         tagName : "article",
         className: "contact-container",
         template: $("#contactTemplate").html(),
@@ -68,7 +77,7 @@
                 value: "addType"
             });
 
-            this.select = directory.createSelectDropDown().addClass("type")
+            this.select = contactsView.createSelectDropDown().addClass("type")
                 .val(this.$el.find("#type").val()).append(newOpt)
                 .insertAfter(this.$el.find(".name"));
 
@@ -113,30 +122,41 @@
     });
 
     //master view
-    var DirectoryView = Backbone.View.extend({
+    var ContactsView = Backbone.View.extend({
         el: $("#content"),
         initialize: function () {
-            this.collection = new Directory(contacts);
-            //render contacts from json
-            this.render();
-            //render the select form with it's options
-            this.renderSelect();
-            //add change event on select that will fiter the contacts
-            this.on("change:filterType", this.filterByType, false);
-            this.collection.on("reset", this.render, this);
+            var that = this;
+            //initialize the collection with all the entries in the db
+            this.collection = new ContactsList();
+            // this.listenTo(this.collection, "reset", this.render, this);
+            //create the GET call grabing all data from DB
+            this.collection.fetch({
+                traditional: true,
+                reset: true,
+                data: {c: "all"},
+                success: function () {
+                    //render the view after the ajax call is done
+                    that.render();
+                    //render the select form with it's options
+                   that.renderSelect();
+                   //add change event on select that will fiter the contacts
+                   that.on("change:filterType", that.filterByType, false);
+                }
+            });
+
             //render the collection with the new contact
             this.collection.on("add", this.renderContact, this);
             this.collection.on("remove", this.removeContact, this);
         },
         render: function () {
             var that = this;
-           this.$el.find("article.contact-container").remove();
+            this.$el.find("article.contact-container").remove();
             _.each(this.collection.models, function (item) {
                 that.renderContact(item);
             }, this);
         },
         renderContact: function (item) {
-            var contactView = new ContactView({
+            var contactView = new ContactItem({
                 model: item
             });
             var contacts = this.$el.find("#contacts");
@@ -187,7 +207,7 @@
                 this.collection.reset(contacts);
                 contactsRouter.navigate("filter/all");
             } else {
-                this.collection.reset(contacts, {silent: true});
+                this.collection.reset(this.collection.models, {silent: true});
                 var filterType = this.filterType,
                     filtered = _.filter(this.collection.models, function (item) {
                         return item.get("type").toLowerCase() === filterType;
@@ -199,12 +219,11 @@
         addContact: function (e) {
             e.preventDefault();
             var newModel = {};
-            $("#addContact").children("input").each(function (i, el){
+            $("#addContact").children("input").each(function (i, el) {
                 if ($(el).val() !== "")
                     newModel[el.id] = $(el).val();
             });
             if (!_.isEmpty(newModel)) {
-                contacts.push(newModel);
                 if (_.indexOf(this.getTypes(), newModel.type) === -1) {
                     this.collection.add(new Contact(newModel));
                     this.$el.find("#filter").find("select").remove().end().append(this.createSelect());
@@ -231,19 +250,10 @@
     });
 
     //init the master view
-    var directory = new DirectoryView();
-    var ContactsRouter = Backbone.Router.extend({
-        routes: {
-            "filter/:type" : "urlFilter",
-        },
-        urlFilter: function (type) {
-            directory.filterType = type;
-            directory.trigger("change:filterType");
-        }
-    });
-
+    var contactsView = new ContactsView();
+    
     //create the footer model
-    var Footer = Backbone.Model.extend();
+    var Footer = Backbone.Model.extend({});
     //init the footer template using the static script in the page
     var FooterTpl = Backbone.View.extend({
         tagName: "li",
@@ -281,7 +291,16 @@
     });
     //ini the footer view
     var footer = new FooterView();
-
+    
+    var ContactsRouter = Backbone.Router.extend({
+        routes: {
+            "filter/:type" : "urlFilter",
+        },  
+        urlFilter: function (type) {
+            contactsView.filterType = type;
+            contactsView.trigger("change:filterType");
+        }   
+    }); 
     //create the router init
     var contactsRouter = new ContactsRouter();
 
