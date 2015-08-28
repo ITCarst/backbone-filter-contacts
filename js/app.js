@@ -141,9 +141,10 @@
                    that.renderSelect();
                    //add change event on select that will fiter the contacts
                    that.on("change:filterType", that.filterByType, false);
+                   
+                   that.collection.on("reset", that.render, that);
                 }
             });
-
             //render the collection with the new contact
             this.collection.on("add", this.renderContact, this);
             this.collection.on("remove", this.removeContact, this);
@@ -193,28 +194,26 @@
             $(flexContainer).append(this.createSelect());
         },
         events: {
-            "change #filter select" : "setFilter",
+            "click #filter a" : "setFilter",
             "click #add" : "addContact",
             "click #showForm": "showForm"
         },
         setFilter: function(e) {
-            this.filterType = e.currentTarget.value;
+            this.filterType = e.currentTarget.getAttribute("data");
             this.trigger("change:filterType");
-
         },
         filterByType: function () {
-            if (this.filterType === "all") {
-                this.collection.reset(contacts);
-                contactsRouter.navigate("filter/all");
-            } else {
-                this.collection.reset(this.collection.models, {silent: true});
-                var filterType = this.filterType,
-                    filtered = _.filter(this.collection.models, function (item) {
-                        return item.get("type").toLowerCase() === filterType;
-                    });
-                this.collection.reset(filtered);
-                contactsRouter.navigate("filter/" + filterType);
-            }
+            //reset the collection
+            this.collection.reset(this.collection.models, {silent: true});
+            //fetch new data based on filter type
+            this.collection.fetch({
+                traditional: true,
+                parse: true,
+                reset: true,
+                data: {c: this.filterType}
+            }); 
+            //set the route based on type
+            contactsRouter.navigate("filter/" + this.filterType);
         },
         addContact: function (e) {
             e.preventDefault();

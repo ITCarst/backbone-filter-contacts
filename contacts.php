@@ -33,34 +33,17 @@ class contactManager
     private function dbData () 
     {
 
-        $db = $this->dbResponse;
-        $resultArray = [];
-
         if ($_SERVER["REQUEST_METHOD"] == "GET") 
         {
            switch($_SERVER["REQUEST_METHOD"]) 
            {
                 case "GET":
                     $arg = $_GET;
+                    
+                    $data = $this->selectFromDb("name, address, tel, type, email", $arg["c"]);
 
-                    if($arg["c"]) {
-                        //select all query
-                        $selectAll = "SELECT name, address, tel, type, email FROM contacts";
+                    echo json_encode($data);
 
-                        //get all the entries from db
-                        if ($result = mysqli_query($db, $selectAll)) 
-                        {
-                            while ($row = $result->fetch_assoc()) 
-                            {
-                                if (!empty($row)) 
-                                    $resultArray[] = $row;
-                            }
-                            echo json_encode($resultArray);
-
-                        } else {
-                            echo "No results found";
-                        }
-                    }
                     break;
 
                 case "POST":
@@ -80,6 +63,32 @@ class contactManager
            } 
        }
             
+    }
+
+    private function selectFromDb ($select,  $type) 
+    {
+        $db = $this->dbResponse;
+        $resultArray = [];
+
+        if ($type == "all")
+            $selectAll = "SELECT " . $select. " FROM contacts ";
+        else 
+            $selectAll = "SELECT " . $select. " FROM contacts WHERE type='" . ucfirst($type) . "'";
+
+        //get all the entries from db
+        if ($result = mysqli_query($db, $selectAll)) 
+        {   
+            while ($row = $result->fetch_assoc()) 
+            {   
+                if (!empty($row)) 
+                    $resultArray[] = $row;
+            }   
+            return $resultArray;
+
+        } else {
+
+            return "No results found";
+        }   
     }
 
 }
