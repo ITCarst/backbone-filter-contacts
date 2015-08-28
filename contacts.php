@@ -4,11 +4,13 @@ ini_set('display_errors',1);
 ini_set('display_startup_errors',1);
 //error_reporting(E_ALL ^ E_DEPRECATED);
 
+require_once("./credentials.php");
+
 class contactManager 
 {
     //create private var to keep mysqli db info
     private $dbResponse;
-
+    
     /*
     * Main Constructor 
     */
@@ -16,7 +18,6 @@ class contactManager
     {
         //db connection
         $this->connect();
-
         //make surethere is a response from the sb
        if (is_object($this->dbResponse))
            $this->dbData();
@@ -25,14 +26,18 @@ class contactManager
     /*
      * Connect to database using user and pass also name the databse
      * Assigns the databse to the private $dbResponse
-     * @param {$u} - db username
-     * @param {$p} - db password
+     * Repalce $u with your database uername
+     * Repalce $p with your db password
+     * @var {$u} - db username
+     * @var {$p} - db password
     */
-    private function connect ($u, $p) 
+    private function connect () 
     {
+        $u = $GLOBALS["credentials"]["user"]; //repalce 
+        $p = $GLOBALS["credentials"]["pass"]; //replace
         //create database connection and select the need db
-       $data = mysqli_connect('localhost:8889', 'root', 'root', "backbone_contacts");
-       
+       $data = mysqli_connect('localhost:8889', $u, $p, "backbone_contacts");
+       //throw error message if there is something with the db connt 
        if ($data->connect_errno) {
            printf("Connection failed: %s\n" , $data->connection_errno);
            exit();
@@ -50,10 +55,15 @@ class contactManager
         {
             case "GET":
                 $arg = $_GET;
+
+                //if the request is missing the GET param exit
+                if (empty($arg)) {
+                    echo "Pleace add params to your url";
+                    exit();
+                }
                 $data = $this->selectFromDb("name, address, tel, type, email", $arg["c"]);
                 echo json_encode($data);
                 break;
-
             case "POST":
                 print_r($_POST);
                 break;

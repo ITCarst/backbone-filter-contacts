@@ -2,3 +2,4 @@
 js/node_modules/*
 *.swp
 *.swo
+credentials.php
