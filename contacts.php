@@ -10,9 +10,10 @@ class contactManager
 
     public function __construct () 
     {
-       $this->connect();
+        //db connection
+        $this->connect();
 
-
+        //make surethere is a response from the sb
        if (is_object($this->dbResponse))
            $this->dbData();
     }
@@ -21,48 +22,37 @@ class contactManager
    {
        $data = mysqli_connect('localhost:8889', 'root', 'root', "backbone_contacts");
        
-       if ($data->connect_errno) 
-       {
+       if ($data->connect_errno) {
            printf("Connection failed: %s\n" , $data->connection_errno);
            exit();
        }
-
+       //assign the db conn to the private var
        $this->dbResponse = $data;
     }
 
     private function dbData () 
     {
-
-        if ($_SERVER["REQUEST_METHOD"] == "GET") 
+        switch($_SERVER["REQUEST_METHOD"]) 
         {
-           switch($_SERVER["REQUEST_METHOD"]) 
-           {
-                case "GET":
-                    $arg = $_GET;
-                    
-                    $data = $this->selectFromDb("name, address, tel, type, email", $arg["c"]);
+            case "GET":
+                $arg = $_GET;
+                $data = $this->selectFromDb("name, address, tel, type, email", $arg["c"]);
+                echo json_encode($data);
+                break;
 
-                    echo json_encode($data);
+            case "POST":
+                print_r($_POST);
+                break;
 
-                    break;
+            case "DELETE":
+                print_r("delete");
+                break;
 
-                case "POST":
-                    print_r($_POST);
-                    break;
-
-                case "DELETE":
-                    print_r("delete");
-                    break;
-
-                case "PUT":
-                    print_r("insert");
-                    break;
-
-                default:
-                    echo "get all";
-           } 
-       }
-            
+            case "PUT":
+                print_r("insert");
+                break;
+        } 
+        mysqli_close($this->dbResponse);
     }
 
     private function selectFromDb ($select,  $type) 
@@ -86,11 +76,9 @@ class contactManager
             return $resultArray;
 
         } else {
-
             return "No results found";
         }   
     }
-
 }
 
 
