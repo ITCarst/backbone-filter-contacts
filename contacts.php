@@ -11,9 +11,6 @@ class contactManager
     //create private var to keep mysqli db info
     private $dbResponse;
     
-    /*
-    * Main Constructor 
-    */
     public function __construct () 
     {
         //db connection
@@ -28,15 +25,17 @@ class contactManager
      * Assigns the databse to the private $dbResponse
      * Repalce $u with your database uername
      * Repalce $p with your db password
-     * @var {$u} - db username
-     * @var {$p} - db password
+     * @var {$u} - string, db username
+     * @var {$p} - string, db password
+     * @var {db} - string, databse name
     */
     private function connect () 
     {
         $u = $GLOBALS["credentials"]["user"]; //repalce 
         $p = $GLOBALS["credentials"]["pass"]; //replace
-        //create database connection and select the need db
-       $data = mysqli_connect('localhost:8889', $u, $p, "backbone_contacts");
+        $db = "backbone_contacts";
+        //create database connection and select the needed db
+       $data = mysqli_connect('localhost:8889', $u, $p, $db);
        //throw error message if there is something with the db connt 
        if ($data->connect_errno) {
            printf("Connection failed: %s\n" , $data->connection_errno);
@@ -47,31 +46,70 @@ class contactManager
     }
 
     /*
-     * Select data from the database based on the request method
+     * SELECT data from the database based on the request GET method
+     * DELETE data based on DELETE request
+     * INSERT new entry based on PUT request
     */
     private function dbData () 
     {
-        switch($_SERVER["REQUEST_METHOD"]) 
+        $http_host = $_SERVER["REQUEST_METHOD"];
+        //get the url path
+        $request = explode("/", substr(@$_SERVER['PATH_INFO'], 1));
+
+        switch($http_host) 
         {
             case "GET":
                 $arg = $_GET;
-
+                
                 //if the request is missing the GET param exit
                 if (empty($arg)) {
                     echo "Pleace add params to your url";
                     exit();
                 }
-                $data = $this->selectFromDb("name, address, tel, type, email", $arg["c"]);
+                $data = [];
+
+                if (array_key_exists("type", $arg))
+                    //select from db
+                    $data = $this->selectFromDb("*", "type='" . ucfirst($arg["type"]) . "'" );
+                else 
+                    $data = $this->selectFromDb("*", $arg["contacts"]);
+
+                //return the data in jSON format
                 echo json_encode($data);
                 break;
-            case "POST":
-                print_r($_POST);
+
+            case "POST": //update
+                print_r("DOES POST\n");
                 break;
+
             case "DELETE":
-                print_r("delete");
+                //check for request that is delete and that there is an 
+                if ($request[0] == "delete" && 
+                    !empty($request[1]) && intval($request[1])) {
+                        $delete = "DELETE FROM contacts WHERE id=". intval($request[1]);
+                        //delete the entry and return response
+                        if ($result = mysqli_query($this->dbResponse, $delete)) 
+                            echo "Entry deleted";
+                        else 
+                            echo "Could not delete the entry";
+                    }
                 break;
             case "PUT":
-                print_r("insert");
+                //grab the put data
+                parse_str(file_get_contents('php://input'), $data);
+                $data = json_decode($data["model"]);
+                
+                $updateContact = "UPDATE contacts SET name='" .$data->name ."', 
+                    address= '" . $data->address . "', 
+                    tel= '" . $data->tel . "', 
+                    type= '" . $data->type . "', email= '" . $data->email . "'
+                    WHERE id= '" . $data->id . "'";
+
+                if (mysqli_query($this->dbResponse, $updateContact))
+                    echo "Entry update succesfully";
+                else 
+                    echo "Sorry something went wrong";
+
                 break;
         }
         //close the connction 
@@ -86,12 +124,12 @@ class contactManager
     {
         $db = $this->dbResponse;
         $resultArray = [];
-
+        
         //for the $type all grab all the entries
         if ($type == "all")
             $selectAll = "SELECT " . $select. " FROM contacts ";
         else 
-            $selectAll = "SELECT " . $select. " FROM contacts WHERE type='" . ucfirst($type) . "'";
+            $selectAll = "SELECT " . $select. " FROM contacts WHERE " . $type;
 
         //get all the entries from db
         if ($result = mysqli_query($db, $selectAll)) 

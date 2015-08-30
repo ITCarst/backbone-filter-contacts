@@ -80,7 +80,7 @@
             <footer id="footer">
                  <ul>
                      <script id="footerTemplate" type="text/template">
-                         <li title="blaaaa"> <%= name %> </li>
+                         <%= name %>
                     </script>
                 </ul>
             </footer>

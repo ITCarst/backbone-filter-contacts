@@ -1,6 +1,6 @@
 (function ($) {
     //enable backbone ajax
-    Backbone.emulateHTTP = true;
+    //Backbone.emulateHTTP = true;
     Backbone.emulateJSON = true;
 
     //footer links array
@@ -22,11 +22,36 @@
     //define the contact model
     var Contact = Backbone.Model.extend({
          defaults: {
+            ID: "",
             photo : "./img/placeholder.png", //default image for contacts
             name : "",
             tel : "",
             email: "",
             type: ""
+        },
+        idAttribute: 'ID',
+        getCustomUrl: function (method) {
+            var id = this.get("id");
+            switch (method) {
+                case "read":
+                    return './contacts.php/user/' + id;
+                    break;
+                case "create":
+                    return "./contacts.php/add/user" + id;
+                    break;
+                case "update":
+                    return "./contacts.php/update/" + id;
+                    break;
+                case "delete":
+                    return "./contacts.php/delete/" + id;
+                    break;
+            }
+        },
+        sync: function (method, model, options) {
+            options || (options = {});
+            options.url = this.getCustomUrl(method.toLowerCase());
+
+            return Backbone.sync.apply(this, arguments);
         }
     });
 
@@ -39,7 +64,6 @@
             return base;
         },
         initialize: function () {
-        
         }
     });
 
@@ -62,12 +86,24 @@
             "click button.cancel" : "cancelEdit"
         },
         deleteContact: function () {
-            var removedType = this.model.get("type").toLowerCase();
-            this.model.destroy();
+            var removedType = this.model.get("type").toLowerCase(),
+                id = this.model.get("id");
+        
+            //do DELETE request to delete the model from DB
+            //send specifyc param in the url so it will be easier to get the DELETE request from backend
+            this.model.destroy({
+                url: "contacts.php/delete/" + id,
+                ID : id
+            });
+
+            //remove view from page
             this.remove();
-            if(_.indexOf(directory.getTypes(), removedType) === -1) 
-                directory.$el.find("#filter div").children("a[data='" + removedType + "']").remove();
+
+            /*if(_.indexOf(contactsView.getTypes(), removedType) === -1) 
+                contactsView.$el.find("#filter div").children("a[data='" + removedType + "']").remove();
+                */
         },
+        //Edit button event
         editContact: function () {
             //render the edit template
             this.$el.html(this.editTemplate(this.model.toJSON()));
@@ -77,11 +113,13 @@
                 value: "addType"
             });
 
+            //create the contact type dropdown
             this.select = contactsView.createSelectDropDown().addClass("type")
                 .val(this.$el.find("#type").val()).append(newOpt)
                 .insertAfter(this.$el.find(".name"));
 
-            this.$el.find("input[type='hidden']").remove();
+            //remove the hidden input
+            //this.$el.find("input[type='hidden']").remove();
 
         },
         addType: function () {
@@ -92,20 +130,29 @@
                 "class" : "type"
             }).insertAfter(this.$el.find(".name").focus());
         },
+        //UPDATE
         saveEdits: function (e) {
             e.preventDefault();
             var formData = {},
-                prev = this.model.previousAttributes();
+                prev = this.model.previousAttributes(),
+                currentModel = this.model,
+                modelId = currentModel.get("id"),
+                that = this;
 
             $(e.target).closest("form").find(":input").add(".photo").each(function (){
                 var el = $(this);
                 formData[el.attr("class")] = el.val();
             });
 
-            if (formData.photo === "")
-                delete formData.photo;
+            //remove empty values || undefined
+            for (var x in formData) {
+                if (formData[x] === "" || x === "undefined") delete formData[x];
+            }
             
+            //insert the new data in the current model 
             this.model.set(formData);
+            this.model.save(formData);
+            //render the updated view
             this.render();
 
             if(prev.photo === "/img/placeholder.png")
@@ -133,7 +180,7 @@
             this.collection.fetch({
                 traditional: true,
                 reset: true,
-                data: {c: "all"},
+                data: {contacts: "all"},
                 success: function () {
                     //render the view after the ajax call is done
                     that.render();
@@ -143,11 +190,12 @@
                    that.on("change:filterType", that.filterByType, false);
                    
                    that.collection.on("reset", that.render, that);
+
                 }
             });
+
             //render the collection with the new contact
             this.collection.on("add", this.renderContact, this);
-            this.collection.on("remove", this.removeContact, this);
         },
         render: function () {
             var that = this;
@@ -210,7 +258,7 @@
                 traditional: true,
                 parse: true,
                 reset: true,
-                data: {c: this.filterType}
+                data: {type: this.filterType}
             }); 
             //set the route based on type
             contactsRouter.navigate("filter/" + this.filterType);
@@ -222,6 +270,7 @@
                 if ($(el).val() !== "")
                     newModel[el.id] = $(el).val();
             });
+
             if (!_.isEmpty(newModel)) {
                 if (_.indexOf(this.getTypes(), newModel.type) === -1) {
                     this.collection.add(new Contact(newModel));
@@ -233,16 +282,6 @@
                 alert("fill in the form pls");
             }
         },
-        removeContact: function (removeModel) {
-            var removed = removeModel.attributes;
-            if(removed.photo === "/img/placeholder.png")
-                delete removed.photo;
-
-            _.each(contacts, function (contact) {
-                if (_.isEqual(contact, removed))
-                    contacts.splice(_.indexOf(contacts, contact), 1);
-            });
-        },
         showForm : function () {
             this.$el.find(".add-contact > div").slideToggle();           
         }
@@ -252,7 +291,7 @@
     var contactsView = new ContactsView();
     
     //create the footer model
-    var Footer = Backbone.Model.extend({});
+    var Footer = Backbone.Model.extend();
     //init the footer template using the static script in the page
     var FooterTpl = Backbone.View.extend({
         tagName: "li",
@@ -261,7 +300,7 @@
         render : function () {
             var tmpl = _.template(this.template);
             this.$el.html(tmpl(this.model.toJSON()));
-                return this;
+            return this;
         }   
     }); 
     //create the footer collection from the model
