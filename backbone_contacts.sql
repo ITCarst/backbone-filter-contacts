@@ -15,7 +15,7 @@ CREATE TABLE `contacts` (
     `id` INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     `name` varchar(255) COLLATE utf8_bin DEFAULT NULL,
     `address` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-    `tel` int(11) DEFAULT NULL,
+    `tel` varchar(255) DEFAULT NULL,
     `type` varchar(255) COLLATE utf8_bin DEFAULT NULL,
     `email` varchar(255) COLLATE utf8_bin DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;

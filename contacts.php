@@ -79,19 +79,15 @@ class contactManager
                 break;
 
             case "POST": //CREATE
-                
-                echo "<pre>";
-
                 $data = json_decode(file_get_contents("php://input"));
-                
                 $insert = "INSERT INTO contacts (name, address, tel, type, email)
                     VALUES ('" . $data->name . "', '" . $data->address ."',
-                            '" . $data->tel . "', '" . $data->type . "', '" . $data->email . "')";
+                        '" . $data->tel . "', '" . $data->type . "', '" . $data->email . "')";
+
                 if (mysqli_query($this->dbResponse, $insert))
                     echo "Entry added succesfully";
                 else
-                    //echo "Something went wrong";
-                    printf("Error: %s\n", $this->dbResponse->error);
+                    echo "Something went wrong";
 
                 break;
 

@@ -282,29 +282,32 @@
 
             //make sure the object is not empty
             if (!_.isEmpty(formData)) {
-                
+                //use lowercase for the conact type
+                formData.type = formData.type.toLowerCase();
+                //create new model fomr the filled from
+                var new_contact = new Contact(formData);
+                //save the new contact in db
+                new_contact.save(null, {
+                    silent: true,
+                    success: function (model, res, options) {
+                        console.log("success");
+                    },
+                    error : function (model, xhr, options) {
+                        console.log("fuck");
+                    }
+                });
+
                 //check if the user added a new type that we don't already have
                 if (_.indexOf(this.getTypes(), formData.type) === -1) 
                 {
-                    console.log(formData);
-                } else {
-                    var new_contact = new Contact(formData);
-
-                    new_contact.save(null, {
-                        silent: true,
-                        success: function (model, res, options) {
-                            console.log("success");
-                        },
-                        error : function (model, xhr, options) {
-                            
-                            console.log("fuck");        
-                        }
-                    });
-                    
-                    this.collection.add(new_contact);
-
+                    console.log("create new filter");
+                    console.log(this.$el.find("#filter div"));
+                    //add new Type to the filter area
+                    this.$el.find("#filter div").append(this.createSelect());
                 }
-            
+
+                //add the new contact to the collection 
+                this.collection.add(new_contact);
             }
 /*
             //do some form validation before
@@ -312,7 +315,6 @@
             if (!_.isEmpty(newModel)) {
                 if (_.indexOf(this.getTypes(), newModel.type) === -1) {
                     this.collection.add(new Contact(newModel));
-                    this.$el.find("#filter").find("select").remove().end().append(this.createSelect());
                 }  else {
                     this.collection.add(new Contact(newModel));
 
