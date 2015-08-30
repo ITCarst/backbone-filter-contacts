@@ -1,8 +1,4 @@
 (function ($) {
-    //enable backbone ajax
-    //Backbone.emulateHTTP = true;
-    Backbone.emulateJSON = true;
-
     //footer links array
     var footerLinks = [{name: "about"}, {name: "contact"}, {name: "similar"}];
     
@@ -22,22 +18,23 @@
     //define the contact model
     var Contact = Backbone.Model.extend({
          defaults: {
-            ID: "",
+            //ID: "",
             photo : "./img/placeholder.png", //default image for contacts
             name : "",
             tel : "",
             email: "",
             type: ""
         },
-        idAttribute: 'ID',
+        //idAttribute: 'ID',
         getCustomUrl: function (method) {
             var id = this.get("id");
+            console.log(method);
             switch (method) {
                 case "read":
                     return './contacts.php/user/' + id;
                     break;
                 case "create":
-                    return "./contacts.php/add/user" + id;
+                    return "./contacts.php/create";
                     break;
                 case "update":
                     return "./contacts.php/update/" + id;
@@ -212,27 +209,35 @@
             $(contacts).append(contactView.render().el);
         },
         getTypes: function () {
-            return _.uniq(this.collection.pluck("type"));
+            var types = _.uniq(this.collection.pluck("type"));
+            //convert the types into lowercase
+            return _.each(types, function (type) {
+              return type.toLowerCase();
+            });
         },
         createSelect: function () {
             var filter = this.$el.find("#filter"),
                 select = $("<div/>", {
                     html: "<a href='#filter/all' data='all'>All</a><br/><br/>"
                 });
+           //create the short contact by type links 
             _.each(this.getTypes(), function (item) {
-                var option = $("<a href='#filter/" + item.toLowerCase() +"' data='" + item.toLowerCase() + "'>" 
+                var option = $("<a href='#filter/" + item +"' data='" + item + "'>" 
                     + item + "</a><br/><br/>").appendTo(select);
             });
+
             return select;
         },
         createSelectDropDown: function () {
             var select = $("<select/>", {
                 html : "<option value='all'>All</option>"
             });
-            _.each(this.getTypes(), function (item) {
+
+            _.each(this.getTypes(), function (item) 
+            {
                 var option = $("<option/>", {
-                    value: item.toLowerCase(),
-                    text:item.toLowerCase()
+                    value: item,
+                    text:item
                 }).appendTo(select);
             });
             return select;
@@ -258,29 +263,64 @@
                 traditional: true,
                 parse: true,
                 reset: true,
-                data: {type: this.filterType}
+                data: (this.filterType === "all") ?{contacts: "all"} :  {type: this.filterType}
             }); 
             //set the route based on type
             contactsRouter.navigate("filter/" + this.filterType);
         },
         addContact: function (e) {
             e.preventDefault();
-            var newModel = {};
+            var formData = {};
+            
+            //loop through the form array and get the value of the inputs
             $("#addContact").children("input").each(function (i, el) {
                 if ($(el).val() !== "")
-                    newModel[el.id] = $(el).val();
+                    formData[el.id] = $(el).val();
             });
 
+            //this.collections.models.push(formData);
+
+            //make sure the object is not empty
+            if (!_.isEmpty(formData)) {
+                
+                //check if the user added a new type that we don't already have
+                if (_.indexOf(this.getTypes(), formData.type) === -1) 
+                {
+                    console.log(formData);
+                } else {
+                    var new_contact = new Contact(formData);
+
+                    new_contact.save(null, {
+                        silent: true,
+                        success: function (model, res, options) {
+                            console.log("success");
+                        },
+                        error : function (model, xhr, options) {
+                            
+                            console.log("fuck");        
+                        }
+                    });
+                    
+                    this.collection.add(new_contact);
+
+                }
+            
+            }
+/*
+            //do some form validation before
+            //dont allow empty fileds
             if (!_.isEmpty(newModel)) {
                 if (_.indexOf(this.getTypes(), newModel.type) === -1) {
                     this.collection.add(new Contact(newModel));
                     this.$el.find("#filter").find("select").remove().end().append(this.createSelect());
                 }  else {
                     this.collection.add(new Contact(newModel));
+
                 }
             } else {
                 alert("fill in the form pls");
             }
+            */
         },
         showForm : function () {
             this.$el.find(".add-contact > div").slideToggle();           

@@ -68,7 +68,9 @@ footer > ul > li {
     border-right: 1px solid #fff;
     padding-top: 2em;
 }
-
+    #filter div a {
+        text-transform: capitalize;
+    }
 .add-contact {
     flex-basis: 20%;
     -webkit-flex-basis: 20%;

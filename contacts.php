@@ -58,7 +58,7 @@ class contactManager
 
         switch($http_host) 
         {
-            case "GET":
+            case "GET": //READ
                 $arg = $_GET;
                 
                 //if the request is missing the GET param exit
@@ -67,10 +67,10 @@ class contactManager
                     exit();
                 }
                 $data = [];
-
+                    
                 if (array_key_exists("type", $arg))
                     //select from db
-                    $data = $this->selectFromDb("*", "type='" . ucfirst($arg["type"]) . "'" );
+                    $data = $this->selectFromDb("*", "type='" . $arg["type"] . "'" );
                 else 
                     $data = $this->selectFromDb("*", $arg["contacts"]);
 
@@ -78,8 +78,21 @@ class contactManager
                 echo json_encode($data);
                 break;
 
-            case "POST": //update
-                print_r("DOES POST\n");
+            case "POST": //CREATE
+                
+                echo "<pre>";
+
+                $data = json_decode(file_get_contents("php://input"));
+                
+                $insert = "INSERT INTO contacts (name, address, tel, type, email)
+                    VALUES ('" . $data->name . "', '" . $data->address ."',
+                            '" . $data->tel . "', '" . $data->type . "', '" . $data->email . "')";
+                if (mysqli_query($this->dbResponse, $insert))
+                    echo "Entry added succesfully";
+                else
+                    //echo "Something went wrong";
+                    printf("Error: %s\n", $this->dbResponse->error);
+
                 break;
 
             case "DELETE":
@@ -94,7 +107,7 @@ class contactManager
                             echo "Could not delete the entry";
                     }
                 break;
-            case "PUT":
+            case "PUT"://UPDATE
                 //grab the put data
                 parse_str(file_get_contents('php://input'), $data);
                 $data = json_decode($data["model"]);
