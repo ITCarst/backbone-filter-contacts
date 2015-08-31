@@ -28,7 +28,6 @@
         //idAttribute: 'ID',
         getCustomUrl: function (method) {
             var id = this.get("id");
-            console.log(method);
             switch (method) {
                 case "read":
                     return './contacts.php/user/' + id;
@@ -96,9 +95,10 @@
             //remove view from page
             this.remove();
 
-            /*if(_.indexOf(contactsView.getTypes(), removedType) === -1) 
+            if(_.indexOf(contactsView.getTypes(), removedType) === -1) {
+                console.log(contactsView.getTypes());
                 contactsView.$el.find("#filter div").children("a[data='" + removedType + "']").remove();
-                */
+            }
         },
         //Edit button event
         editContact: function () {
@@ -212,7 +212,7 @@
             var types = _.uniq(this.collection.pluck("type"));
             //convert the types into lowercase
             return _.each(types, function (type) {
-              return type.toLowerCase();
+                return type.toLowerCase();
             });
         },
         createSelect: function () {
@@ -233,8 +233,7 @@
                 html : "<option value='all'>All</option>"
             });
 
-            _.each(this.getTypes(), function (item) 
-            {
+            _.each(this.getTypes(), function (item) {
                 var option = $("<option/>", {
                     value: item,
                     text:item
@@ -278,9 +277,8 @@
                     formData[el.id] = $(el).val();
             });
 
-            //this.collections.models.push(formData);
-
             //make sure the object is not empty
+            //add validation if needed
             if (!_.isEmpty(formData)) {
                 //use lowercase for the conact type
                 formData.type = formData.type.toLowerCase();
@@ -288,41 +286,20 @@
                 var new_contact = new Contact(formData);
                 //save the new contact in db
                 new_contact.save(null, {
-                    silent: true,
-                    success: function (model, res, options) {
-                        console.log("success");
-                    },
-                    error : function (model, xhr, options) {
-                        console.log("fuck");
-                    }
+                    silent: true
                 });
 
                 //check if the user added a new type that we don't already have
                 if (_.indexOf(this.getTypes(), formData.type) === -1) 
                 {
-                    console.log("create new filter");
-                    console.log(this.$el.find("#filter div"));
-                    //add new Type to the filter area
-                    this.$el.find("#filter div").append(this.createSelect());
+                    var selectGroup = this.$el.find("#filter div a");
+                    $(selectGroup).remove();
+                    $(selectGroup).append(this.createSelect());
                 }
 
                 //add the new contact to the collection 
                 this.collection.add(new_contact);
             }
-/*
-            //do some form validation before
-            //dont allow empty fileds
-            if (!_.isEmpty(newModel)) {
-                if (_.indexOf(this.getTypes(), newModel.type) === -1) {
-                    this.collection.add(new Contact(newModel));
-                }  else {
-                    this.collection.add(new Contact(newModel));
-
-                }
-            } else {
-                alert("fill in the form pls");
-            }
-            */
         },
         showForm : function () {
             this.$el.find(".add-contact > div").slideToggle();           

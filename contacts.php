@@ -82,7 +82,7 @@ class contactManager
                 $data = json_decode(file_get_contents("php://input"));
                 $insert = "INSERT INTO contacts (name, address, tel, type, email)
                     VALUES ('" . $data->name . "', '" . $data->address ."',
-                        '" . $data->tel . "', '" . $data->type . "', '" . $data->email . "')";
+                        '" . $data->tel . "', '" . strtolower($data->type) . "', '" . $data->email . "')";
 
                 if (mysqli_query($this->dbResponse, $insert))
                     echo "Entry added succesfully";
@@ -105,13 +105,12 @@ class contactManager
                 break;
             case "PUT"://UPDATE
                 //grab the put data
-                parse_str(file_get_contents('php://input'), $data);
-                $data = json_decode($data["model"]);
-                
+                $data = json_decode(file_get_contents("php://input"));
+                //create the update query 
                 $updateContact = "UPDATE contacts SET name='" .$data->name ."', 
                     address= '" . $data->address . "', 
                     tel= '" . $data->tel . "', 
-                    type= '" . $data->type . "', email= '" . $data->email . "'
+                    type= '" .strtolower($data->type) . "', email= '" . $data->email . "'
                     WHERE id= '" . $data->id . "'";
 
                 if (mysqli_query($this->dbResponse, $updateContact))
