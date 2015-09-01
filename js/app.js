@@ -1,4 +1,22 @@
+require.config({
+    baseUrl: "js/",
+    paths: {
+        jquery: "node_modules/jquery/dist/jquery.min",
+        underscore: "node_modules/underscore/underscore-min",
+        backbone: "node_modules/backbone/backbone-min",
+        templates: "../templates"
+    }
+});
+
+require([
+    "router"
+], function (Router) {
+    Router.initialize();
+});
+
+/*
 (function ($) {
+
     //footer links array
     var footerLinks = [{name: "about"}, {name: "contact"}, {name: "similar"}];
     
@@ -364,7 +382,7 @@
 
 })(jQuery);
 
-
+*/
 
 
 

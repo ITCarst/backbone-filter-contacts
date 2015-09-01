@@ -7,16 +7,11 @@
     </head>
     <body>
 
-
         <div class="flex-container" id="content">
-
             <header role="banner">Header</header>
-
             <main class="flex-container flex-content">
                 <div class="add-contact">
-
                     <a id="showForm" href="#">Add new Contact</a>
-
                     <div>
                         Add Contact:<br/>
                         <form id="addContact" action="#">
@@ -84,13 +79,9 @@
                     </script>
                 </ul>
             </footer>
-
         </div>
+        <script data-main="js/app.js" src="js/require.min.js"></script>
 
-        <script src="js/node_modules/jquery/dist/jquery.min.js"></script>
-        <script src="js/node_modules/underscore/underscore-min.js"></script>
-        <script src="js/node_modules/backbone/backbone-min.js"></script>
-        <script src="js/app.js"></script>
     </body>
 </html>
 
