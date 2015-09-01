@@ -1,5 +1,7 @@
 #ignore node_modules folder
 js/node_modules/*
+#ignore swp files
 *.swp
 *.swo
+#don't add credentials ;)
 config/credentials.php
