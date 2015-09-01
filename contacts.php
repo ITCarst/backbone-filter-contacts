@@ -84,11 +84,13 @@ class contactManager
                     VALUES ('" . $data->name . "', '" . $data->address ."',
                         '" . $data->tel . "', '" . strtolower($data->type) . "', '" . $data->email . "')";
 
-                if (mysqli_query($this->dbResponse, $insert))
-                    echo "Entry added succesfully";
-                else
+                if (mysqli_query($this->dbResponse, $insert)) {
+                    header('Content-Type: application/json');
+                    echo json_encode("Entry Saved");
+                    exit;
+                } else {
                     echo "Something went wrong";
-
+                }
                 break;
 
             case "DELETE":

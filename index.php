@@ -45,7 +45,7 @@
                 </div>
 
                 <nav class="mailbox-list">
-                     <div id="filter"><label>Show me: </label></div>
+                     <div id="filter"><label>Filter By: </label></div>
                 </nav>
 
                 <article class="message">

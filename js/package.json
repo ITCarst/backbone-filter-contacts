@@ -1,7 +1,7 @@
 {
     "name" : "Backbone_Tutorial",
     "version" : "1.0.0",
-    "description" : "backbone tutorial based on http://code.tutsplus.com/tutorials/build-a-contacts-manager-using-backbonejs-part-1--net-24277",
+    "description" : "backbone playground",
     "main": "app.js",
     "author" : "itCarst",
     "devDependencies" : {

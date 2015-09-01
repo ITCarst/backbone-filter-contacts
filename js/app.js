@@ -96,7 +96,6 @@
             this.remove();
 
             if(_.indexOf(contactsView.getTypes(), removedType) === -1) {
-                console.log(contactsView.getTypes());
                 contactsView.$el.find("#filter div").children("a[data='" + removedType + "']").remove();
             }
         },
@@ -183,16 +182,17 @@
                     that.render();
                     //render the select form with it's options
                    that.renderSelect();
+
                    //add change event on select that will fiter the contacts
                    that.on("change:filterType", that.filterByType, false);
                    
                    that.collection.on("reset", that.render, that);
-
                 }
             });
 
             //render the collection with the new contact
             this.collection.on("add", this.renderContact, this);
+
         },
         render: function () {
             var that = this;
@@ -209,29 +209,30 @@
             $(contacts).append(contactView.render().el);
         },
         getTypes: function () {
-            var types = _.uniq(this.collection.pluck("type"));
+            var types = this.collection.map(function (model) {
+                return model.attributes.type;
+            });
+            var types = _.uniq(types);
             //convert the types into lowercase
             return _.each(types, function (type) {
                 return type.toLowerCase();
             });
         },
-        createSelect: function () {
+        createFilter: function () {
             var filter = this.$el.find("#filter"),
                 select = $("<div/>", {
-                    html: "<a href='#filter/all' data='all'>All</a><br/><br/>"
+                    html: "<a href='#filter/all' data='all'>All</a>"
                 });
            //create the short contact by type links 
             _.each(this.getTypes(), function (item) {
                 var option = $("<a href='#filter/" + item +"' data='" + item + "'>" 
-                    + item + "</a><br/><br/>").appendTo(select);
+                    + item + "</a>").appendTo(select);
             });
-
+            
             return select;
         },
         createSelectDropDown: function () {
-            var select = $("<select/>", {
-                html : "<option value='all'>All</option>"
-            });
+            var select = $("<select/>");
 
             _.each(this.getTypes(), function (item) {
                 var option = $("<option/>", {
@@ -243,7 +244,7 @@
         },
         renderSelect: function () {
             var flexContainer = this.$el.find("#filter");
-            $(flexContainer).append(this.createSelect());
+            $(flexContainer).append(this.createFilter());
         },
         events: {
             "click #filter a" : "setFilter",
@@ -269,7 +270,7 @@
         },
         addContact: function (e) {
             e.preventDefault();
-            var formData = {};
+            var formData = {}, that = this;;
             
             //loop through the form array and get the value of the inputs
             $("#addContact").children("input").each(function (i, el) {
@@ -286,19 +287,28 @@
                 var new_contact = new Contact(formData);
                 //save the new contact in db
                 new_contact.save(null, {
-                    silent: true
+                    rest: true,
+                    success: function (model, resp, options) {
+
+                        //check if the user added a new type that we don't already have
+                        if (_.indexOf(that.getTypes(), formData.type) === -1) 
+                        {
+                            var selectGroup = that.$el.find("#filter div");
+                            //add the new contact to the collection 
+                            that.collection.add(new_contact);
+                            //remove the list of category contact
+                            $(selectGroup).find("a").remove();
+                            //append the new list including the new type
+                            $(selectGroup).append(filter);
+                        } else {
+                            //add the new contact to the collection 
+                            that.collection.add(new_contact);
+                        }
+                    },
+                    error : function (model, xhr, options) {
+                        console.log(model, xhr, options);        
+                    }
                 });
-
-                //check if the user added a new type that we don't already have
-                if (_.indexOf(this.getTypes(), formData.type) === -1) 
-                {
-                    var selectGroup = this.$el.find("#filter div a");
-                    $(selectGroup).remove();
-                    $(selectGroup).append(this.createSelect());
-                }
-
-                //add the new contact to the collection 
-                this.collection.add(new_contact);
             }
         },
         showForm : function () {
