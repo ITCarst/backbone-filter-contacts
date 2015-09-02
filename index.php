@@ -11,26 +11,25 @@
             <header role="banner">Header</header>
             <main class="flex-container flex-content">
                 <div class="add-contact">
-                    <a id="showForm" href="#">Add new Contact</a>
+                    <a id="showForm" href="#">Add new Contact:</a>
                     <div>
-                        Add Contact:<br/>
                         <form id="addContact" action="#">
-                            <label for="photo">Photo:</label><br/>
+                            <label for="photo">Photo:</label>
                             <input id="photo" type="file"/>
 
-                            <label for="type">Type:</label><br/>
+                            <label for="type">Type:</label>
                             <input id="type" type="text"/>
 
-                            <label for="name">Name: </label><br/>
+                            <label for="name">Name: </label>
                              <input id="name" type="text"/>
 
-                             <label for="address">Address:</label><br/>
+                             <label for="address">Address:</label>
                             <input id="address" type="text"/>
 
-                            <label for="tel">Tel:</label><br/>
+                            <label for="tel">Tel:</label>
                             <input id="tel" type="text"/>
 
-                            <label for="email">Email:</label><br/>
+                            <label for="email">Email:</label>
                             <input id="email" type="text"/>
 
                             <button id="add">Add</button>
@@ -43,11 +42,9 @@
                      <div id="filter"><label>Filter By: </label></div>
                 </nav>
 
-                <article class="message">
-                    <div id="contacts">
-                        <script id="contactTemplate" type="text/template"></script>
-                        <script id="contactEditTemplate" type="text/template"></script>
-                    </div>
+                <article class="message" id="contacts">
+                    <script id="contactTemplate" type="text/template"></script>
+                    <script id="contactEditTemplate" type="text/template"></script>
                 </article>
             </main>
 
