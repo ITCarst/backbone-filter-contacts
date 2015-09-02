@@ -55,7 +55,7 @@
                 <ul></ul>
             </footer>
         </div>
-        <script data-main="js/main.js" src="js/require.min.js"></script>
+        <script data-main="js/main.js" src="js/libs/require.min.js"></script>
 
     </body>
 </html>
