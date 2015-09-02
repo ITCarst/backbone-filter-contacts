@@ -13,6 +13,5 @@ Build using Backbone, and as a backend service it's using php.
 ### how to use
 ` 
 run npm install - inside js folder;
-
 run the backbone_contacts.sql - from the db folder;
 ` 
