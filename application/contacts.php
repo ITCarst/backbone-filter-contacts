@@ -54,6 +54,7 @@ class contactManager
         $http_host = $_SERVER["REQUEST_METHOD"];
         //get the url path
         $request = explode("/", substr(@$_SERVER['PATH_INFO'], 1));
+        $db = $this->dbResponse; 
 
         switch($http_host) 
         {
@@ -66,10 +67,9 @@ class contactManager
                     exit();
                 }
                 $data = [];
-                    
                 if (array_key_exists("type", $arg))
                     //select from db
-                    $data = $this->selectFromDb("*", "type='" . $arg["type"] . "'" );
+                    $data = $this->selectFromDb("*",  $arg["type"] );
                 else 
                     $data = $this->selectFromDb("*", $arg["contacts"]);
 
@@ -80,45 +80,66 @@ class contactManager
             case "POST": //CREATE
                 $data = json_decode(file_get_contents("php://input"));
                 $insert = "INSERT INTO contacts (name, address, tel, type, email)
-                    VALUES ('" . $data->name . "', '" . $data->address ."',
-                        '" . $data->tel . "', '" . strtolower($data->type) . "', '" . $data->email . "')";
+                    VALUES (?, ?, ?, ?, ?)";
 
-                if (mysqli_query($this->dbResponse, $insert)) {
-                    header('Content-Type: application/json');
-                    echo json_encode("Entry Saved");
-                    exit;
-                } else {
-                    echo "Something went wrong";
+                if($stmt = $db->prepare($insert)) 
+                {
+                    $type = strtolower($data->type);
+
+                    $stmt->bind_param("sssss", $data->name, $data->address, 
+                        $data->tel, $type, $data->email);
+
+                    if ($stmt->execute()) 
+                    {
+                        header('Content-Type: application/json');
+                        echo json_encode("Entry Saved");
+                        exit;
+                    } else {
+                        echo "Something went wrong";
+                    }  
+
+                   $stmt->close(); 
                 }
                 break;
 
             case "DELETE":
                 //check for request that is delete and that there is an 
                 if ($request[0] == "delete" && 
-                    !empty($request[1]) && intval($request[1])) {
-                        $delete = "DELETE FROM contacts WHERE id=". intval($request[1]);
+                    !empty($request[1]) && intval($request[1])) 
+                {
+                    $delete = "DELETE FROM contacts WHERE id=?";
+                    if ($stmt = $db->prepare($delete)) 
+                    {
+                        $id = intval($request[1]);
+                        $stmt->bind_param("d", $id);
                         //delete the entry and return response
-                        if ($result = mysqli_query($this->dbResponse, $delete)) 
+                        if ($stmt->execute()) 
                             echo "Entry deleted";
                         else 
                             echo "Could not delete the entry";
                     }
+                }
                 break;
             case "PUT"://UPDATE
                 //grab the put data
                 $data = json_decode(file_get_contents("php://input"));
                 //create the update query 
-                $updateContact = "UPDATE contacts SET name='" .$data->name ."', 
-                    address= '" . $data->address . "', 
-                    tel= '" . $data->tel . "', 
-                    type= '" .strtolower($data->type) . "', email= '" . $data->email . "'
-                    WHERE id= '" . $data->id . "'";
+                $updateContact = "UPDATE contacts SET name=?, 
+                    address=?, tel=?, type=?, email=?
+                    WHERE id=?";
+                if ($stmt = $db->prepare($updateContact)) 
+                {
+                    $type = strtolower($data->type);
+                    $stmt->bind_param("sssssd", $data->name, $data->address, 
+                        $data->tel, $type, $data->email, $data->id);     
 
-                if (mysqli_query($this->dbResponse, $updateContact))
-                    echo "Entry update succesfully";
-                else 
-                    echo "Sorry something went wrong";
-
+                    if ($stmt->execute())
+                        echo "Entry update succesfully";
+                    else 
+                        echo "Sorry something went wrong";
+                    
+                    $stmt->close();
+                }
                 break;
         }
         //close the connction 
@@ -138,10 +159,15 @@ class contactManager
         if ($type == "all")
             $selectAll = "SELECT " . $select. " FROM contacts ";
         else 
-            $selectAll = "SELECT " . $select. " FROM contacts WHERE " . $type;
+            $selectAll = "SELECT " . $select. " FROM contacts WHERE type = ?";
 
+        $stmt = $db->prepare($selectAll);
+        if ($type !== "all") 
+            $stmt->bind_param('s', $type);
+        $stmt->execute();
+        $result = $stmt->get_result();
         //get all the entries from db
-        if ($result = mysqli_query($db, $selectAll)) 
+        if ($result) 
         {   
             //loop through the result using assoc
             while ($row = $result->fetch_assoc()) 
