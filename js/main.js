@@ -1,20 +1,79 @@
-define([
-    "jquery",
-    "underscore",
-    "backbone",
-    "router",
-    "models/contacts",
-    "collections/contacts",
-    "text!templates/contacts.html",
-    "text!templates/editContacts.html"
-], function ($, _, Backbone, contactsRouter, ContactsModel,  ContactsCollection, contactsTemplate, contactEditTemplate) {
+require.config({
+    baseUrl: "js/",
+    paths: {
+        jquery: "node_modules/jquery/dist/jquery.min",
+        underscore: "node_modules/underscore/underscore-min",
+        backbone: "node_modules/backbone/backbone-min",
+        templates: "../templates"
+    }
+});
+
+require([
+    "app"
+], function (App) {
+    App.initialize();
+});
+
+/*
+(function ($) {
+
+    //footer links array
+    var footerLinks = [{name: "about"}, {name: "contact"}, {name: "similar"}];
+    
+    //define the contact model
+    var Contact = Backbone.Model.extend({
+         defaults: {
+            //ID: "",
+            photo : "./img/placeholder.png", //default image for contacts
+            name : "",
+            tel : "",
+            email: "",
+            type: ""
+        },
+        //idAttribute: 'ID',
+        getCustomUrl: function (method) {
+            var id = this.get("id");
+            switch (method) {
+                case "read":
+                    return './contacts.php/user/' + id;
+                    break;
+                case "create":
+                    return "./contacts.php/create";
+                    break;
+                case "update":
+                    return "./contacts.php/update/" + id;
+                    break;
+                case "delete":
+                    return "./contacts.php/delete/" + id;
+                    break;
+            }
+        },
+        sync: function (method, model, options) {
+            options || (options = {});
+            options.url = this.getCustomUrl(method.toLowerCase());
+
+            return Backbone.sync.apply(this, arguments);
+        }
+    });
+
+    //define collection dir
+    var ContactsList = Backbone.Collection.extend({
+        model: Contact,
+        urlRoot : "./contacts.php",
+        url: function () {
+            var base = this.urlRoot || (this.collection && this.collection.url) || "/";
+            return base;
+        },
+        initialize: function () {
+        }
+    });
 
     //contacts view tempalte with the data from the array
     var ContactItem = Backbone.View.extend({
         tagName : "article",
         className: "contact-container",
-        template: contactsTemplate,
-        editTemplate : contactEditTemplate,
+        template: $("#contactTemplate").html(),
+        editTemplate : _.template($("#contactEditTemplate").html()),
         render: function () {
             var tmpl = _.template(this.template);
             this.$el.html(tmpl(this.model.toJSON()));
@@ -30,22 +89,25 @@ define([
         deleteContact: function () {
             var removedType = this.model.get("type").toLowerCase(),
                 id = this.model.get("id");
-            //send specifyc param in the url so it will be easier to get the DELETE request fro
+        
+            //do DELETE request to delete the model from DB
+            //send specifyc param in the url so it will be easier to get the DELETE request from backend
             this.model.destroy({
                 url: "contacts.php/delete/" + id,
                 ID : id
             });
+
             //remove view from page
             this.remove();
-            //if(_.indexOf(contactsView.getTypes(), removedType) === -1) {
-              //  contactsView.$el.find("#filter div").children("a[data='" + removedType + "']");
-            //}
+
+            if(_.indexOf(contactsView.getTypes(), removedType) === -1) {
+                contactsView.$el.find("#filter div").children("a[data='" + removedType + "']").remove();
+            }
         },
-       //Edit button event
+        //Edit button event
         editContact: function () {
-            var editTmpl = _.template(this.editTemplate);
             //render the edit template
-            this.$el.html(editTmpl(this.model.toJSON()));
+            this.$el.html(this.editTemplate(this.model.toJSON()));
             //build the 
             var newOpt = $("<option", {
                 html : "<em>Add new..</em>",
@@ -56,8 +118,10 @@ define([
             this.select = contactsView.createSelectDropDown().addClass("type")
                 .val(this.$el.find("#type").val()).append(newOpt)
                 .insertAfter(this.$el.find(".name"));
+
             //remove the hidden input
             //this.$el.find("input[type='hidden']").remove();
+
         },
         addType: function () {
             if (this.select.val() === "addType") 
@@ -111,7 +175,7 @@ define([
         initialize: function () {
             var that = this;
             //initialize the collection with all the entries in the db
-            this.collection = new ContactsCollection();
+            this.collection = new ContactsList();
             // this.listenTo(this.collection, "reset", this.render, this);
             //create the GET call grabing all data from DB
             this.collection.fetch({
@@ -207,39 +271,40 @@ define([
                 data: (this.filterType === "all") ?{contacts: "all"} :  {type: this.filterType}
             }); 
             //set the route based on type
-            //contactsRouter.navigate("filter/" + this.filterType);
+            contactsRouter.navigate("filter/" + this.filterType);
         },
-       addContact: function (e) {
+        addContact: function (e) {
             e.preventDefault();
-            var formData = {}, that = this;
+            var formData = {}, that = this;;
             
             //loop through the form array and get the value of the inputs
             $("#addContact").children("input").each(function (i, el) {
                 if ($(el).val() !== "")
                     formData[el.id] = $(el).val();
             });
+
             //make sure the object is not empty
             //add validation if needed
             if (!_.isEmpty(formData)) {
                 //use lowercase for the conact type
                 formData.type = formData.type.toLowerCase();
                 //create new model fomr the filled from
-                var new_contact = new ContactsModel(formData);
+                var new_contact = new Contact(formData);
                 //save the new contact in db
                 new_contact.save(null, {
                     rest: true,
                     success: function (model, resp, options) {
+
                         //check if the user added a new type that we don't already have
                         if (_.indexOf(that.getTypes(), formData.type) === -1) 
                         {
                             var selectGroup = that.$el.find("#filter div");
                             //add the new contact to the collection 
                             that.collection.add(new_contact);
-                            //remove the types
+                            //remove the list of category contact
                             $(selectGroup).find("a").remove();
                             //append the new list including the new type
-                            $(selectGroup).append(that.renderSelect());
-
+                            $(selectGroup).append(filter);
                         } else {
                             //add the new contact to the collection 
                             that.collection.add(new_contact);
@@ -255,9 +320,72 @@ define([
             this.$el.find(".add-contact > div").slideToggle();           
         }
     });
-   
+
+    //init the master view
     var contactsView = new ContactsView();
+    
+    //create the footer model
+    var Footer = Backbone.Model.extend();
+    //init the footer template using the static script in the page
+    var FooterTpl = Backbone.View.extend({
+        tagName: "li",
+        className: "footerLinks",
+        template: $("#footerTemplate").html(),
+        render : function () {
+            var tmpl = _.template(this.template);
+            this.$el.html(tmpl(this.model.toJSON()));
+            return this;
+        }   
+    }); 
+    //create the footer collection from the model
+    var FooterDir = Backbone.Collection.extend({
+        model: Footer
+    }); 
+    //extend the view and fill the template with the data
+    var FooterView = Backbone.View.extend({
+        el: $("#footer"),
+        initialize: function () {
+            this.collection = new FooterDir(footerLinks);
+            this.render();
+        },  
+        render : function () {
+            var that = this;
+            _.each(this.collection.models, function (item) {
+                that.renderFooterLinks(item);
+            }); 
+        },
+        renderFooterLinks: function (item) {
+            var footerTpl = new FooterTpl({
+                model : item
+            });
+            this.$el.find("ul").append(footerTpl.render().el);
+        }
+    });
+    //ini the footer view
+    var footer = new FooterView();
+    
+    var ContactsRouter = Backbone.Router.extend({
+        routes: {
+            "filter/:type" : "urlFilter",
+        },  
+        urlFilter: function (type) {
+            contactsView.filterType = type;
+            contactsView.trigger("change:filterType");
+        }   
+    }); 
+    //create the router init
+    var contactsRouter = new ContactsRouter();
 
-    return ContactsView;
+    //start the backbone history service
+    Backbone.history.start();
 
-});
+
+})(jQuery);
+
+*/
+
+
+
+
+
+

@@ -6,13 +6,13 @@ define([
     "text!templates/footer.html"
 ], function ($, _, Backbone, FooterCollection, footerTemplate) {
    
-   var footerLinks = [{name: "about"}, {name: "contact"}, {name: "similar"}];
-
-   //foter template using the static script in the page
+    var footerLinks = [{name: "about"}, {name: "contact"}, {name: "similar"}];
+   
+    //foter template using the static script in the page
     var FooterTpl = Backbone.View.extend({
         tagName: "li",
         className: "footerLinks",
-        template: $("#footerTemplate").html(),
+        template: footerTemplate,
         render : function () {
             var  tmpl = _.template(this.template);
             this.$el.html(this.model.toJSON().name);
@@ -26,7 +26,6 @@ define([
         el: $("#footer"),
         initialize: function () {
             this.collection = new FooterCollection(footerLinks);
-
             this.render();
         },  
         render : function () {

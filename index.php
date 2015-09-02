@@ -45,42 +45,17 @@
 
                 <article class="message">
                     <div id="contacts">
-                        <script id="contactTemplate" type="text/template">
-                            <img src="<%= photo %>" alt="<%= name %>" />
-                            <h1><%= name %><span><%= type %></span></h1>
-                            <div> <%= address %></div>
-                            <button class="delete">Delete</button>
-                            <button class="edit">Edit</button>
-                            <dl>
-                                <dt>Tel: <%= tel %></dt>
-                                <dd>Email: <%= email %></dd>
-                            </dl>
-                        </script>
-                        <script id="contactEditTemplate" type="text/template">
-                            <form action="#">
-                                <input type="file" value="<%= photo %>" />
-                                <input class="name" value ="<%= name %>" />
-                                <input id="type" type="hidden" value="<%= type %>" />
-                                <input class="address" value="<%= address %>" />
-                                <input class="tel" value="<%= tel %>" />
-                                <input class="email" value="<%= email %>" />
-                                <button class="save">Save</button>
-                                <button class="cancel"> Cancel</button>
-                            </form>
-                        </script>
-                 </div>
+                        <script id="contactTemplate" type="text/template"></script>
+                        <script id="contactEditTemplate" type="text/template"></script>
+                    </div>
                 </article>
             </main>
 
             <footer id="footer">
-                 <ul>
-                     <script id="footerTemplate" type="text/template">
-                         <%= name %>
-                    </script>
-                </ul>
+                <ul></ul>
             </footer>
         </div>
-        <script data-main="js/app.js" src="js/require.min.js"></script>
+        <script data-main="js/main.js" src="js/require.min.js"></script>
 
     </body>
 </html>
