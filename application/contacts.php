@@ -84,23 +84,26 @@ class contactManager
                 $insert = "INSERT INTO contacts (name, address, tel, type, email)
                     VALUES (?, ?, ?, ?, ?)";
 
-                if($stmt = $db->prepare($insert)) 
-                {
-                    $type = strtolower($data->type);
-
-                    $stmt->bind_param("sssss", $data->name, $data->address, 
-                        $data->tel, $type, $data->email);
-
-                    if ($stmt->execute()) 
-                    {
+                if($stmt = $db->prepare($insert))
+                {       
+                    $name = $db->real_escape_string($data->name);
+                    $address = $db->real_escape_string($data->address);
+                    $tel = $db->real_escape_string($data->tel);
+                    $email = $db->real_escape_string($data->email);
+                    $type = $db->real_escape_string(strtolower($data->type));
+                    //bind 
+                    $stmt->bind_param("sssss", $name, $address, $tel, $type, $email);
+                    
+                    if ($stmt->execute())
+                    {   
                         header('Content-Type: application/json');
                         echo json_encode("Entry Saved");
                         exit;
-                    } else {
+                    } else { 
                         echo "Something went wrong";
-                    }  
-
-                   $stmt->close(); 
+                    }
+                   
+                   $stmt->close();
                 }
                 break;
 
@@ -112,7 +115,7 @@ class contactManager
                     $delete = "DELETE FROM contacts WHERE id=?";
                     if ($stmt = $db->prepare($delete)) 
                     {
-                        $id = intval($request[1]);
+                        $id = $db->real_escape_string(intval($request[1]));
                         $stmt->bind_param("d", $id);
                         //delete the entry and return response
                         if ($stmt->execute()) 
@@ -125,15 +128,19 @@ class contactManager
             case "PUT"://UPDATE
                 //grab the put data
                 $data = json_decode(file_get_contents("php://input"));
-                //create the update query 
                 $updateContact = "UPDATE contacts SET name=?, 
-                    address=?, tel=?, type=?, email=?
-                    WHERE id=?";
+                    address=?, tel=?, type=?, email=? WHERE id=?";
+
                 if ($stmt = $db->prepare($updateContact)) 
                 {
-                    $type = strtolower($data->type);
-                    $stmt->bind_param("sssssd", $data->name, $data->address, 
-                        $data->tel, $type, $data->email, $data->id);     
+                    $name = $db->real_escape_string($data->name);
+                    $address = $db->real_escape_string($data->address);
+                    $tel = $db->real_escape_string($data->tel);
+                    $email = $db->real_escape_string($data->email);
+                    $id = $db->real_escape_string($data->id);
+                    $type = $db->real_escape_string(strtolower($data->type));
+
+                    $stmt->bind_param("sssssd", $name, $address, $tel, $type, $email, $id);
 
                     if ($stmt->execute())
                         echo "Entry update succesfully";
@@ -152,38 +159,34 @@ class contactManager
      * @param {$select} - string, that includes the asked columns from the table
      * @param {type} - WHERE clause that selects the contact based on 'type' filed
     */
-    private function selectFromDb ($select,  $type) 
+    private function selectFromDb ($select,  $type)
     {
         $db = $this->dbResponse;
         $resultArray = [];
-        
+
         //for the $type all grab all the entries
         if ($type == "all")
             $selectAll = "SELECT " . $select. " FROM contacts ";
-        else 
-            $selectAll = "SELECT " . $select. " FROM contacts WHERE type = ?";
+        else
+            $selectAll = "SELECT " . $select. " FROM contacts WHERE type = '" .
+                $db->real_escape_string($type) . "'";
 
-        $stmt = $db->prepare($selectAll);
-        if ($type !== "all") 
-            $stmt->bind_param('s', $type);
-        $stmt->execute();
-        $result = $stmt->get_result();
         //get all the entries from db
-        if ($result) 
-        {   
+        if ($result = $db->query($selectAll))
+        {
             //loop through the result using assoc
-            while ($row = $result->fetch_assoc()) 
-            {   
+            while ($row = $result->fetch_assoc())
+            {
                 //add the entries into the $resultArray
-                if (!empty($row)) 
+                if (!empty($row))
                     $resultArray[] = $row;
-            }   
+            }
             //return the array with the entries
             return $resultArray;
         } else {
             //return a plain string so that we have something to display if there is no data 
             return "No results found";
-        }   
+        }
     }
 }
 
