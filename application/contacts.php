@@ -32,9 +32,11 @@ class contactManager
     {
         $u = $GLOBALS["credentials"]["user"]; //repalce 
         $p = $GLOBALS["credentials"]["pass"]; //replace
-        $db = "backbone_contacts";
+        $db = $GLOBALS["credentials"]["db"];
+        $host = $GLOBALS["credentials"]["host"];
+
         //create database connection and select the needed db
-       $data = mysqli_connect('localhost:8889', $u, $p, $db);
+       $data = mysqli_connect($host, $u, $p, $db);
        //throw error message if there is something with the db connt 
        if ($data->connect_errno) {
            printf("Connection failed: %s\n" , $data->connection_errno);
