@@ -14,3 +14,6 @@ Build using Backbone, and as a backend service it's using php.
 run npm install - inside js folder;
 
 run backbone_contacts.sql - from the db folder
+
+#### demo
+https://carst.me/tutorials/backbone-filter-contacts/
