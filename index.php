@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8"/>
         <title>Backbone.js Web App</title>
-        <link rel="stylesheet" href="css/screen.css" />
+        <link rel="stylesheet" href="dist/screen.min.css" />
     </head>
     <body>
 
@@ -52,7 +52,7 @@
                 <ul></ul>
             </footer>
         </div>
-        <script data-main="js/main.js" src="js/libs/require.min.js"></script>
+        <script data-main="dist/main.min.js" src="js/libs/require.min.js"></script>
 
     </body>
 </html>
