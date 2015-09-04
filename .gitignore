@@ -5,3 +5,8 @@ js/node_modules/*
 *.swo
 #don't add credentials ;)
 config/credentials.php
+
+#ignore cache file
+js/.sass-cache
+
+
