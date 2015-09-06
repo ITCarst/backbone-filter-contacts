@@ -3,6 +3,6 @@ node_js:
     - "0.12.2"
 before_script:
     - npm install -g gulp
-script js/gulp
+script gulp
 
 
