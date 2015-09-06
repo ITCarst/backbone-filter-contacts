@@ -5,7 +5,7 @@ define([
     "collections/footer",
     "text!templates/footer.html"
 ], function ($, _, Backbone, FooterCollection, footerTemplate) {
-   
+
     var footerLinks = [{name: "about"}, {name: "contact"}, {name: "similar"}];
    
     //foter template using the static script in the page

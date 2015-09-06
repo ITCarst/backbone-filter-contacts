@@ -80,7 +80,7 @@ gulp.task("watch", function () {
     //watch sass files
     gulp.watch("../scss/screen.scss", ["sass"]);
     //watch js files
-    gulp.watch("**/*.js", ["js"]);
+    gulp.watch("**/*.js", ["build"]);
     //create livereaload
     livereload.listen();
     //watch the files on dist folder

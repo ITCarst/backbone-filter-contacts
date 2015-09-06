@@ -9,11 +9,5 @@
         backbone: "../node_modules/backbone/backbone-min",
         templates: "templates",
         text: "../libs/text"
-//        "views/footer": "empty",
-  //      "views/contacts": "empty",
-    //    "collections/footer": "empty",
-      //  "collections/contacts": "empty",
-       // "models/footer" : "empty",
-        //"models/contacts": "empty"
     }
 }

@@ -12,6 +12,7 @@ define([
             return base;
         },
         initialize: function () {
+
         }
     });
 

@@ -6,8 +6,15 @@ define([
     "models/contacts",
     "collections/contacts",
     "text!templates/contacts.html",
-    "text!templates/editContacts.html"
-], function ($, _, Backbone, contactsRouter, ContactsModel,  ContactsCollection, contactsTemplate, contactEditTemplate) {
+    "text!templates/editContacts.html",
+    "views/offline.mode"
+], function ($, _, Backbone, 
+    contactsRouter, ContactsModel,  ContactsCollection, 
+    contactsTemplate, contactEditTemplate, Offline) 
+{
+
+    var Offline = new Offline();
+    Offline.checkConn();
 
     //contacts view tempalte with the data from the array
     var ContactItem = Backbone.View.extend({
@@ -110,8 +117,10 @@ define([
         el: $("#content"),
         initialize: function () {
             var that = this;
+
             //initialize the collection with all the entries in the db
             this.collection = new ContactsCollection();
+
             // this.listenTo(this.collection, "reset", this.render, this);
             //create the GET call grabing all data from DB
             this.collection.fetch({
