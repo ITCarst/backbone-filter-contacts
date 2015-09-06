@@ -72,7 +72,7 @@ gulp.task("clean", function () {
 
 //Default task
 gulp.task("default", ["clean"], function () {
-    gulp.start("sass", "test_r", "build");
+    gulp.start("sass", "test_r");
 });
 
 gulp.task("tests", function () {
