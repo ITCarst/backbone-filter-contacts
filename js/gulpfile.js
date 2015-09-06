@@ -75,6 +75,11 @@ gulp.task("default", ["clean"], function () {
     gulp.start("sass", "test_r", "build");
 });
 
+gulp.task("tests", function () {
+    return gulp.src("tests")
+        .pipe(jasmine());
+});
+
 //Gulp Watch
 gulp.task("watch", function () {
     //watch sass files
