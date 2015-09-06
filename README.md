@@ -1,6 +1,6 @@
 # backbone-filter-contacts
 
-[![NPM version][npm-image]][npm-url] [![Build Status](https://travis-ci.org/IonutC/backbone-filter-contacts.svg?branch=master)](https://travis-ci.org/IonutC/backbone-filter-contacts)
+[![NPM version](https://d25lcipzij17d.cloudfront.net/badge.png?id=js&type=3d&v=1.1.0&x2=0)][badge] [![Build Status](https://travis-ci.org/IonutC/backbone-filter-contacts.svg?branch=master)](https://travis-ci.org/IonutC/backbone-filter-contacts)
 
 A small Backbone application, where you can:
 - add
