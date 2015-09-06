@@ -51,7 +51,7 @@ gulp.task("test_r", function () {
 //build the main.min.js
 gulp.task("build", function () {
     return gulp.src("")
-        .pipe(shell(["r.js -o build.js"]))
+        .pipe(shell(["r.js -o js/build.js"]))
         .pipe(notify("Build completed!"));
 });
 
@@ -72,7 +72,7 @@ gulp.task("clean", function () {
 
 //Default task
 gulp.task("default", ["clean"], function () {
-    gulp.start("sass", "test_r");
+    gulp.start("sass", "test_r", "build");
 });
 
 gulp.task("tests", function () {
