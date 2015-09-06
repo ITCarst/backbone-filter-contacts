@@ -3,3 +3,7 @@ node_js:
     - "0.12.2"
 before_script:
     - npm install -g gulp
+    - npm --prefix ./ install ./js
+after_script:
+    - echo "Build executed!"
+
