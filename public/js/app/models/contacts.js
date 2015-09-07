@@ -1,11 +1,12 @@
 define([
     "backbone"        
 ], function (Backbone) {
+    "use strict";
 
     //create the contact model
     var ContactsModel = Backbone.Model.extend({
         defaults: {
-            photo: "./img/placeholder.png",
+            photo: "./public/img/placeholder.png",
             name: "",
             tel: "",
             email: "",
@@ -13,28 +14,29 @@ define([
         },
         getCustomUrl: function (method) {
             //get the model id
-            var cId = this.get("id"),
-                method = method.toLowerCase();
+            var cId = this.get("id"), uri = "";
 
             //build custom url's for CRUD
-            switch(method) {
+            switch(method.toLowerCase()) {
                 case "create":
-                    return "./application/contacts.php/create";
+                    uri = "./application/contacts.php/create";
                     break;
                 case "read":
-                    return "./application/contacts.php/user/" + cId;
+                    uri = "./application/contacts.php/user/" + cId;
                     break;
                 case "update":
-                    return "./application/contacts.php/update/" + cId;
+                    uri =  "./application/contacts.php/update/" + cId;
                     break;
                 case "delete":
-                    return "./application/contacts.php/delete/" + cId;
+                    uri = "./application/contacts.php/delete/" + cId;
                     break;
-            }              
+            }            
+
+            return uri;
         },
         sync: function (method, model, options) {
-            options || (options = {});
-            options.url = this.getCustomUrl(method);
+            var opt = options || (options = {});
+            opt.url = this.getCustomUrl(method);
 
             return Backbone.sync.apply(this, arguments);
         }

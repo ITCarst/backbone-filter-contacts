@@ -4,7 +4,9 @@ define([
     "backbone",
     "collections/footer",
     "text!templates/footer.html"
-], function ($, _, Backbone, FooterCollection, footerTemplate) {
+], function ($, _, Backbone, FooterCollection, footerTemplate) 
+{
+    "use strict";
 
     var footerLinks = [{name: "about"}, {name: "contact"}, {name: "similar"}];
    

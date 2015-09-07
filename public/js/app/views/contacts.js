@@ -12,9 +12,10 @@ define([
     contactsRouter, ContactsModel,  ContactsCollection, 
     contactsTemplate, contactEditTemplate, Offline) 
 {
+    "use strict";
 
-    var Offline = new Offline();
-    Offline.checkConn();
+    var offline = new Offline();
+    offline.checkConn();
 
     //contacts view tempalte with the data from the array
     var ContactItem = Backbone.View.extend({
@@ -162,7 +163,7 @@ define([
             var types = this.collection.map(function (model) {
                 return model.attributes.type;
             });
-            var types = _.uniq(types);
+            types = _.uniq(types);
             //convert the types into lowercase
             return _.each(types, function (type) {
                 return type.toLowerCase();
@@ -175,8 +176,7 @@ define([
                 });
            //create the short contact by type links 
             _.each(this.getTypes(), function (item) {
-                var option = $("<a href='#filter/" + item +"' data='" + item + "'>" 
-                    + item + "</a>").appendTo(select);
+                var option = $("<a href='#filter/" + item +"' data='" + item + "'>" + item + "</a>").appendTo(select);
             });
             
             return select;

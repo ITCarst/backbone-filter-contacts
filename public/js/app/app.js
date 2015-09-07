@@ -12,8 +12,9 @@ define([
             contactsRouter = new ContactsRouter();
         //start the backbone history service
         Backbone.history.start();
-    }
+    };
+
     return {
         initialize: init
-    }
+    };
 });

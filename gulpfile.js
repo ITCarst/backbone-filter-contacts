@@ -6,9 +6,6 @@ var gulp = require("gulp"),
     del = require("del"),
     livereload = require("gulp-livereload");
 
-//Build Dependencies
-var browserify = require("gulp-browserify");
-
 //Style Dependencies
 var sass = require("gulp-sass"),
     minifycss = require("gulp-minify-css");
@@ -20,13 +17,12 @@ var jshint = require("gulp-jshint"),
     shell = require("gulp-shell");
 
 //Test Dependencies
-var jasmine = require("gulp-jasmine"),
-    mocha = require("gulp-mocha");
+var karma = require("karma").server;
 
 //Tasks
 //jshint - client js
 gulp.task("lint-client", function () {
-    return gulp.src(["**/*.js", "!node_modles/**", "!libs/**", "!gulpfile.js"])
+    return gulp.src(["public/js/**/*.js", "!node_modles/**", "!public/js/libs/**", "!gulpfile.js", "!public/js/build.js"])
         .pipe(jshint())
         .pipe(jshint.reporter("default"));
 });
@@ -51,7 +47,7 @@ gulp.task("test_r", function () {
 //build the main.min.js
 gulp.task("build", function () {
     return gulp.src("")
-        .pipe(shell(["r.js -o js/build.js"]))
+        .pipe(shell(["r.js -o public/js/build.js"]))
         .pipe(notify("Build completed!"));
 });
 
@@ -65,19 +61,27 @@ gulp.task("sass", function () {
         .pipe(notify({message : "Styles completed!"}));
 });
 
+gulp.task("test", function (done) {
+    karma.start({
+        configFile: __dirname + "/karma.conf.js",
+        singleRun: true
+    }, function (exitCode) {
+        done(exitCode ? "There are failing unit tests" : undefined);
+    });
+});
+
 //Clean
 gulp.task("clean", function () {
     del(["../dist"]);
 });
 
+gulp.task("autotest", function () {
+    gulp.start("test");
+});
+
 //Default task
 gulp.task("default", ["clean"], function () {
     gulp.start("sass", "test_r", "build");
-});
-
-gulp.task("tests", function () {
-    return gulp.src("tests")
-        .pipe(jasmine());
 });
 
 //Gulp Watch

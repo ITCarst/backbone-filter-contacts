@@ -4,7 +4,9 @@ define([
     "backbone"
 ], function ($, _, Backbone) {
 
-    var Offline =  function () {}
+    "use strict";
+
+    var Offline =  function () {};
 
     Offline.prototype = {
         checkConn: function () 
@@ -29,7 +31,7 @@ define([
         },
         editItem: function () {
         }
-    }
+    };
     
     return Offline;
 
