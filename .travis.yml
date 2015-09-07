@@ -6,8 +6,8 @@ before_script:
     - "sh -e /etc/init.d/xvfb start"
     - npm install
 script: 
-    - ./node_modules/karma/bin/karma start karma.conf.js --browsers Firefox --single-run
     - gulp
+    - ./node_modules/karma/bin/karma start karma.conf.js --browsers Firefox --single-run
 after_script:
     - echo "Build executed!"
 
