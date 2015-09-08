@@ -1,9 +1,22 @@
-describe("FooterModel", function () {
+define(["/base/public/js/app/models/footer.js"], function (FooterModel) {
 
-    it ("should pass", function () {
+    describe("FooterModel", function () {
 
-        expect(true).toBe(true);
+        beforeEach(function () {
+            this.footerLink = new FooterModel({
+                name: "link1"
+            });
+        });
 
+        describe('when instantiated', function () {
+            it('should exhibit attributes', function () {
+                expect(this.footerLink.get("name")).toEqual("link1");
+            });
+            it("should have id undefiend", function () {
+                expect(this.footerLink.get("id")).toBeUndefined();
+                
+            });
+        });
     });
-
 });
+
