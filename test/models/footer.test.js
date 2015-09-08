@@ -1,4 +1,4 @@
-define(["/base/public/js/app/models/footer.js"], function (FooterModel) {
+define(["footerModel"], function (FooterModel) {
 
     describe("FooterModel", function () {
 

@@ -3,8 +3,8 @@ define([
     "underscore",
     "backbone",
     "router",
-    "models/contacts",
-    "collections/contacts",
+    "contactsModel",
+    "contactsCollection",
     "text!templates/contacts.html",
     "text!templates/editContacts.html",
     "views/offline.mode"

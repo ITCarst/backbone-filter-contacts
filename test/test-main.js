@@ -14,19 +14,22 @@ Object.keys(window.__karma__.files).forEach(function(file) {
 
   
 require.config({
-  // Karma serves files under /base, which is the basePath from your config file
-  baseUrl: '/base',
-
+    // Karma serves files under /base, which is the basePath from your config file
+    baseUrl: '/base',
     paths: {
         "jquery" : "/base/node_modules/jquery/dist/jquery.min",
         "underscore" : "/base/node_modules/underscore/underscore-min",
-        "backbone" : "/base/node_modules/backbone/backbone-min"
+        "backbone" : "/base/node_modules/backbone/backbone-min",
+        "footerModel" : "/base/public/js/app/models/footer",
+        "footerCollection" : "/base/public/js/app/collections/footer",
+        "footerView": "/base/public/js/app/views/footer",
+        "contactModel" : "/base/public/js/app/models/contacts",
+        "contactCollection" : "/base/public/js/app/collections/contacts",
+        "contactsView" : "/base/public/js/app/views/contacts"
     },
-    
+    // dynamically load all test files
+    deps: allTestFiles,
 
-  // dynamically load all test files
-  deps: allTestFiles,
-
-  // we have to kickoff jasmine, as it is asynchronous
-  callback: window.__karma__.start
+    // we have to kickoff jasmine, as it is asynchronous
+    callback: window.__karma__.start
 });

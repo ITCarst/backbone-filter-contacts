@@ -1,6 +1,6 @@
 define([
     "backbone",
-    "views/contacts"
+    "contactsView"
 ], function (Backbone, ContactsView) {
     //define the Backbone Router
     var ContactsRouter = Backbone.Router.extend({

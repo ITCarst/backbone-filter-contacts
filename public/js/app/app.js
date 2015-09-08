@@ -3,8 +3,8 @@ define([
     "underscore",
     "backbone",
     "router",
-    "views/footer",
-    "views/contacts"
+    "footerView",
+    "contactsView"
 ], function ($, _, Backbone, ContactsRouter, FooterView, ContactsView) {
     //main init fn
     var init = function () {

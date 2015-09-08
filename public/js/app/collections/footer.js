@@ -1,6 +1,6 @@
 define([
     "backbone",
-    "models/footer"
+    "footerModel"
 ], function (Backbone, FooterModel) {
     "use strict";
 

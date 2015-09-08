@@ -1,6 +1,6 @@
 define([
     "backbone",
-    "../models/contacts"
+    "contactsModel"
 ], function (Backbone, ContactsModel) {
     "use strict";
 
