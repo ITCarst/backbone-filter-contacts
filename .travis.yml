@@ -7,7 +7,6 @@ before_script:
     - npm install
 script: 
     - gulp
-    - npm install -g karma-jasmine
     - ./node_modules/karma/bin/karma start karma.conf.js --browsers Firefox --single-run
 after_script:
     - echo "Build executed!"
