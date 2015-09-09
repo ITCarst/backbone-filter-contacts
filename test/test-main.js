@@ -23,8 +23,8 @@ require.config({
         "footerModel" : "/base/public/js/app/models/footer",
         "footerCollection" : "/base/public/js/app/collections/footer",
         "footerView": "/base/public/js/app/views/footer",
-        "contactModel" : "/base/public/js/app/models/contacts",
-        "contactCollection" : "/base/public/js/app/collections/contacts",
+        "contactsModel" : "/base/public/js/app/models/contacts",
+        "contactsCollection" : "/base/public/js/app/collections/contacts",
         "contactsView" : "/base/public/js/app/views/contacts"
     },
     // dynamically load all test files

@@ -7,7 +7,7 @@ define(["footerModel"], function (FooterModel) {
                 name: "link1"
             });
         });
-
+        
         describe('when instantiated', function () {
             it('should exhibit attributes', function () {
                 expect(this.footerLink.get("name")).toEqual("link1");

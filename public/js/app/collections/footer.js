@@ -7,5 +7,6 @@ define([
     var FooterCollection = Backbone.Collection.extend({
         model: FooterModel
     }); 
+
     return FooterCollection;
 });
