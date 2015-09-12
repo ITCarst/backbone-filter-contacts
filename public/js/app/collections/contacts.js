@@ -14,7 +14,7 @@ define([
         },
         initialize: function () {
 
-        }
+        },
     });
 
     return ContactsCollection;

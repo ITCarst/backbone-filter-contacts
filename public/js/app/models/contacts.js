@@ -39,7 +39,7 @@ define([
             opt.url = this.getCustomUrl(method);
 
             return Backbone.sync.apply(this, arguments);
-        }
+        },
     });
 
     return ContactsModel;

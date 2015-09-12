@@ -19,11 +19,11 @@ define([
         },
         //load data from localStorage
         loadData: function () {
-            var a = localStorage.getItem("contacts");
-            if (!a)
+            var ls = localStorage.getItem("contacts");
+            if (!ls)
                 return "No data Found";
             else 
-                return JSON.parse(a);
+                return JSON.parse(JSON.parse(ls));
         },
 
         //save single contact
@@ -36,14 +36,22 @@ define([
         },
         //edit single contact
         editItem: function () {
-        }
-        
+        },
+        getByType: function (type) {
+            if (!type) return false;
+            var data = this.loadData(), items = [];
+            //loop and get only the items that matches the type
+            data.forEach(function (item) {
+                if (type === item.type)
+                    items.push(item);
+            });
 
+            return items;
+        }
     };
 
     var o = new Offline();
-    o.loadData();
-    
+    console.log(o.getByType("family")); 
     return Offline;
 
 });

@@ -17,6 +17,8 @@ define([
             expect(offline.saveItem).toBeDefined();
             expect(offline.deleteItem).toBeDefined();
             expect(offline.editItem).toBeDefined();
+            expect(offline.getByType).toBeDefined();
+
         });
         it("should call the methods", function () {
             spyOn(offline, "setData");
@@ -24,6 +26,7 @@ define([
             spyOn(offline, "saveItem");
             spyOn(offline, "deleteItem");
             spyOn(offline, "editItem");
+            spyOn(offline, "getByType");
 
             offline.setData();
             offline.loadData();
@@ -31,12 +34,14 @@ define([
             offline.saveItem();
             offline.editItem();
             offline.deleteItem();
+            offline.getByType();
 
             expect(offline.setData).toHaveBeenCalled();
             expect(offline.loadData).toHaveBeenCalled();
             expect(offline.saveItem).toHaveBeenCalled();
             expect(offline.deleteItem).toHaveBeenCalled();
             expect(offline.editItem).toHaveBeenCalled();
+            expect(offline.getByType).toHaveBeenCalled();
         });
         
         describe("methods", function () {
@@ -78,7 +83,6 @@ define([
                 it("should return string if no data is sent", function () {
                     expect(offline.saveItem()).toBe("Please fill the form");
                 });
-
             });
 
             describe("#editItem", function () {
@@ -86,7 +90,16 @@ define([
             });
 
             describe("#deleteItem", function () {
-            
+            });
+
+            describe("#getByType", function () {
+                it("should return data by type", function () {
+                    expect(offline.getByType("family")).toEqual(jasmine.any(Object));
+                });
+
+                it("should return false if no type is sent", function () {
+                    expect(offline.getByType()).toBe(false); 
+                });
             });
         });
     });
