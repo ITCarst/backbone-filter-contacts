@@ -1,7 +1,8 @@
 define([
     "backbone",
-    "../models/contacts"
+    "contactsModel"
 ], function (Backbone, ContactsModel) {
+    "use strict";
 
     var ContactsCollection = Backbone.Collection.extend({
         model: ContactsModel,
@@ -13,7 +14,7 @@ define([
         },
         initialize: function () {
 
-        }
+        },
     });
 
     return ContactsCollection;

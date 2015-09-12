@@ -3,7 +3,7 @@ error_reporting( E_ALL | E_STRICT );
 ini_set('display_errors',1);
 ini_set('display_startup_errors',1);
 
-require_once("../config/credentials.php");
+require_once("config/credentials.php");
 
 class contactManager 
 {

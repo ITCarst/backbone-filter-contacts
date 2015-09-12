@@ -1,6 +1,6 @@
 define([
     "backbone",
-    "views/contacts"
+    "contactsView"
 ], function (Backbone, ContactsView) {
     //define the Backbone Router
     var ContactsRouter = Backbone.Router.extend({
@@ -10,7 +10,13 @@ define([
         urlFilter: function (type) {
             ContactsView.filterType = type;
             //ContactsView.trigger("change:filterType");
-        }   
+        },
+        initialize: function () {
+            return this;
+        }
     }); 
+
+    
     return ContactsRouter;
+
 });

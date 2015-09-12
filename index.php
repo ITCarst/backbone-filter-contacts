@@ -6,7 +6,6 @@
         <link rel="stylesheet" href="dist/screen.min.css" />
     </head>
     <body>
-
         <div class="flex-container" id="content">
             <header role="banner">Header</header>
             <main class="flex-container flex-content">
@@ -52,8 +51,8 @@
                 <ul></ul>
             </footer>
         </div>
-        <script data-main="js/app/main.js" src="js/libs/require.min.js"></script>
-        <!-- <script data-main="dist/main.min.js" src="js/libs/require.min.js"></script> -->
+        <script data-main="public/js/app/main.js" src="public/js/libs/require.min.js"></script> 
+        <!-- <script data-main="dist/main.min.js" src="public/js/libs/require.min.js"></script> -->
     </body>
 </html>
 

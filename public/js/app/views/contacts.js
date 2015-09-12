@@ -2,19 +2,18 @@ define([
     "jquery",
     "underscore",
     "backbone",
-    "router",
-    "models/contacts",
-    "collections/contacts",
+    "contactsModel",
+    "contactsCollection",
     "text!templates/contacts.html",
     "text!templates/editContacts.html",
-    "views/offline.mode"
-], function ($, _, Backbone, 
-    contactsRouter, ContactsModel,  ContactsCollection, 
+    "offline"
+], function ($, _, Backbone,
+    ContactsModel,  ContactsCollection, 
     contactsTemplate, contactEditTemplate, Offline) 
 {
+    "use strict";
 
-    var Offline = new Offline();
-    Offline.checkConn();
+    var offline = new Offline();
 
     //contacts view tempalte with the data from the array
     var ContactItem = Backbone.View.extend({
@@ -117,32 +116,42 @@ define([
         el: $("#content"),
         initialize: function () {
             var that = this;
-
             //initialize the collection with all the entries in the db
-            this.collection = new ContactsCollection();
-
-            // this.listenTo(this.collection, "reset", this.render, this);
-            //create the GET call grabing all data from DB
-            this.collection.fetch({
-                traditional: true,
-                reset: true,
-                data: {contacts: "all"},
-                success: function () {
-                    //render the view after the ajax call is done
-                    that.render();
-                    //render the select form with it's options
-                   that.renderSelect();
-
-                   //add change event on select that will fiter the contacts
-                   that.on("change:filterType", that.filterByType, false);
-                   
-                   that.collection.on("reset", that.render, that);
-                }
-            });
-
+            that.collection = new ContactsCollection();
+            //if there is no data in localStorage then grab it from the server
+            if (offline.loadData() === "No data Found") {
+                //create the GET call grabing all data from DB
+                that.collection.fetch({
+                    traditional: true,
+                    reset: true,
+                    data: {contacts: "all"},
+                    success: function (collection, data) {
+                        //save data in the localStorage
+                        offline.setData(JSON.stringify(data));
+                        //render the view after the ajax call is done
+                        that.render();
+                        //render the select form with it's options
+                        that.renderSelect();
+                        //add change event on select that will fiter the contacts
+                        that.on("change:filterType", that.filterByType, false);
+                        that.collection.on("reset", that.render, that);
+                    }
+                });
+            } else {
+                //there is data in the localStorage so build the collection with it
+                var items = offline.loadData();
+                //push the localStorage data into the collection
+                that.collection.push(items);
+                //render the template
+                that.render();
+                //render the Filter by section
+                that.renderSelect();
+                //add change event on select that will fiter the contacts
+                that.on("change:filterType", that.filterByType, false);
+                that.collection.on("reset", that.render, that);
+            }
             //render the collection with the new contact
             this.collection.on("add", this.renderContact, this);
-
         },
         render: function () {
             var that = this;
@@ -162,7 +171,7 @@ define([
             var types = this.collection.map(function (model) {
                 return model.attributes.type;
             });
-            var types = _.uniq(types);
+            types = _.uniq(types);
             //convert the types into lowercase
             return _.each(types, function (type) {
                 return type.toLowerCase();
@@ -175,8 +184,7 @@ define([
                 });
            //create the short contact by type links 
             _.each(this.getTypes(), function (item) {
-                var option = $("<a href='#filter/" + item +"' data='" + item + "'>" 
-                    + item + "</a>").appendTo(select);
+                var option = $("<a href='#filter/" + item +"' data='" + item + "'>" + item + "</a>").appendTo(select);
             });
             
             return select;
@@ -208,15 +216,31 @@ define([
         filterByType: function () {
             //reset the collection
             this.collection.reset(this.collection.models, {silent: true});
-            //fetch new data based on filter type
-            this.collection.fetch({
-                traditional: true,
-                parse: true,
-                reset: true,
-                data: (this.filterType === "all") ?{contacts: "all"} :  {type: this.filterType}
-            }); 
+
+            if (offline.loadData() === "No data Found") { 
+                //fetch new data based on filter type
+                this.collection.fetch({
+                    traditional: true,
+                    parse: true,
+                    reset: true,
+                    data: (this.filterType === "all") ?{contacts: "all"} :  {type: this.filterType}
+                }); 
+            } else {
+                var router = new Backbone.Router(), items;
+                //change url when user clicks on filter links
+                router.navigate("filter/" + this.filterType);
+
+                if (this.filterType === "all")
+                    items = offline.loadData();
+                else 
+                    //get the new items by type
+                    items = offline.getByType(this.filterType);
+
+                this.collection.reset(); 
+                //push the data in the collection
+                this.collection.push(items); 
+            }
             //set the route based on type
-            //contactsRouter.navigate("filter/" + this.filterType);
         },
        addContact: function (e) {
             e.preventDefault();
