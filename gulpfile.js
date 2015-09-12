@@ -53,11 +53,11 @@ gulp.task("build", function () {
 
 //Styles
 gulp.task("sass", function () {
-    return gulp.src("../scss/screen.scss", {style : "expanded"})
+    return gulp.src("public/scss/screen.scss", {style : "expanded"})
         .pipe(sass())
         .pipe(rename({suffix: ".min"}))
         .pipe(minifycss())
-        .pipe(gulp.dest("../dist"))
+        .pipe(gulp.dest("dist"))
         .pipe(notify({message : "Styles completed!"}));
 });
 
@@ -87,11 +87,11 @@ gulp.task("default", ["clean"], function () {
 //Gulp Watch
 gulp.task("watch", function () {
     //watch sass files
-    gulp.watch("../scss/screen.scss", ["sass"]);
+    gulp.watch("public/scss/screen.scss", ["sass"]);
     //watch js files
     gulp.watch("**/*.js", ["build"]);
     //create livereaload
     livereload.listen();
     //watch the files on dist folder
-    gulp.watch(["../dist/**"]).on("change", livereload.changed);
+    gulp.watch(["dist/**"]).on("change", livereload.changed);
 });

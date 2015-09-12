@@ -13,7 +13,9 @@ require.config({
         footerView: "views/footer",
         contactsModel: "models/contacts",
         contactsCollection: "collections/contacts",
-        contactsView: "views/contacts"
+        contactsView: "views/contacts",
+        router: "router",
+        offline: "offline.module"
     }
 });
 

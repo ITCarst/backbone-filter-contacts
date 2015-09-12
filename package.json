@@ -33,11 +33,10 @@
     "karma-chrome-launcher": "^0.2.0",
     "karma-firefox-launcher": "latest",
     "karma-jasmine": "^0.3.6",
-    "karma-sinon": "latest",
-    "karma-requirejs" : "latest",
     "karma-phantomjs-launcher": "^0.2.1",
+    "karma-requirejs": "latest",
     "karma-safari-launcher": "^0.1.1",
-    "karma-spec-reporter": "latest",
+    "karma-sinon": "latest",
     "requirejs": "~2.1.20",
     "underscore": "*"
   },

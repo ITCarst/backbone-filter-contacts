@@ -25,7 +25,9 @@ require.config({
         "footerView": "/base/public/js/app/views/footer",
         "contactsModel" : "/base/public/js/app/models/contacts",
         "contactsCollection" : "/base/public/js/app/collections/contacts",
-        "contactsView" : "/base/public/js/app/views/contacts"
+        "contactsView" : "/base/public/js/app/views/contacts",
+        "router" : "/base/public/js/app/router",
+        "offline" : "/base/public/js/app/offline.module"
     },
     // dynamically load all test files
     deps: allTestFiles,

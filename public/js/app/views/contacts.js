@@ -7,7 +7,7 @@ define([
     "contactsCollection",
     "text!templates/contacts.html",
     "text!templates/editContacts.html",
-    "views/offline.mode"
+    "offline"
 ], function ($, _, Backbone, 
     contactsRouter, ContactsModel,  ContactsCollection, 
     contactsTemplate, contactEditTemplate, Offline) 
@@ -15,7 +15,6 @@ define([
     "use strict";
 
     var offline = new Offline();
-    offline.checkConn();
 
     //contacts view tempalte with the data from the array
     var ContactItem = Backbone.View.extend({
@@ -128,7 +127,7 @@ define([
                 traditional: true,
                 reset: true,
                 data: {contacts: "all"},
-                success: function () {
+                success: function (data) {
                     //render the view after the ajax call is done
                     that.render();
                     //render the select form with it's options
