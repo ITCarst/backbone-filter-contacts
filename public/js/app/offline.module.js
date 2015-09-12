@@ -14,7 +14,7 @@ define([
             if (!data && data !== "undefined") {
                 return "Please add data";
             } else {
-                return localStorage.setItem("contacts", JSON.stringify(data)) || "Could not save";
+                return localStorage.setItem("contacts", data) || "Could not save";
             }
         },
         //load data from localStorage
@@ -23,7 +23,7 @@ define([
             if (!ls)
                 return "No data Found";
             else 
-                return JSON.parse(JSON.parse(ls));
+                return JSON.parse(ls);
         },
 
         //save single contact
@@ -39,19 +39,22 @@ define([
         },
         getByType: function (type) {
             if (!type) return false;
+
             var data = this.loadData(), items = [];
-            //loop and get only the items that matches the type
-            data.forEach(function (item) {
-                if (type === item.type)
-                    items.push(item);
-            });
+
+            if (typeof data !== "string")
+                //loop and get only the items that matches the type
+                data.forEach(function (item) {
+                    if (type === item.type)
+                        items.push(item);
+                });
 
             return items;
         }
     };
 
     var o = new Offline();
-    console.log(o.getByType("family")); 
+    //console.log(o.getByType("family")); 
     return Offline;
 
 });

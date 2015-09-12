@@ -48,7 +48,7 @@ define([
             var data, ls = localStorage;
 
             beforeEach(function () {
-                mockData = '[{"id":"3","name":"Contact 2","address":"1, a street, a town, a city, AB12 3CD","tel":"123456789","type":"family","email":"anemail@me.com"},{"id":"4","name":"Contact 4","address":"1, a street, a town, a city, AB12 3CD","tel":"123456789","type":"colleagues","email":"anemail@me.com"},{"id":"5","name":"Contact 5","address":"1, a street, a town, a city, AB12 3CD","tel":"123456789","type":"friends","email":"anemail@me.com"},{"id":"6","name":"asd","address":"asd","tel":"sad","type":"bla","email":"asd"}]';
+                mockData = '[{"id":"3","name":"Contact 2","address":"1, a street, a town, a city, AB12 3CD","tel":"123456789","type":"family","email":"anemail@me.com"}, {"id":"4","name":"Contact 4","address":"1, a street, a town, a city, AB12 3CD","tel":"123456789","type":"colleagues","email":"anemail@me.com"}, {"id":"5","name":"Contact 5","address":"1, a street, a town, a city, AB12 3CD","tel":"123456789","type":"friends","email":"anemail@me.com"}, {"id":"6","name":"asd","address":"asd","tel":"sad","type":"bla","email":"asd"}]';
             });
             
             afterEach(function () {
@@ -86,7 +86,7 @@ define([
             });
 
             describe("#editItem", function () {
-               console.log("edit item test"); 
+               //console.log("edit item test"); 
             });
 
             describe("#deleteItem", function () {
@@ -94,6 +94,7 @@ define([
 
             describe("#getByType", function () {
                 it("should return data by type", function () {
+                    offline.setData(mockData);
                     expect(offline.getByType("family")).toEqual(jasmine.any(Object));
                 });
 
