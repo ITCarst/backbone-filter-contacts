@@ -22,13 +22,13 @@ var karma = require("karma").server;
 //Tasks
 //jshint - client js
 gulp.task("lint-client", function () {
-    return gulp.src(["public/js/**/*.js", "!node_modles/**", "!public/js/libs/**", "!gulpfile.js", "!public/js/build.js"])
+    return gulp.src(["public/js/**/*.js", "!public/js/libs/**", "!public/js/build.js"])
         .pipe(jshint())
         .pipe(jshint.reporter("default"));
 });
 //jshint - tests js
-gulp.task("lint-tests", function () {
-    return gulp.src("./tests/**/*js")
+gulp.task("lint-test", function () {
+    return gulp.src("test/**/*.test.js")
         .pipe(jshint())
         .pipe(jshint.reporter("default"));
 });
@@ -55,8 +55,8 @@ gulp.task("build", function () {
 gulp.task("sass", function () {
     return gulp.src("public/scss/screen.scss", {style : "expanded"})
         .pipe(sass())
-        .pipe(rename({suffix: ".min"}))
-        .pipe(minifycss())
+        //.pipe(rename({suffix: ".min"}))
+        //.pipe(minifycss())
         .pipe(gulp.dest("dist"))
         .pipe(notify({message : "Styles completed!"}));
 });
@@ -64,7 +64,7 @@ gulp.task("sass", function () {
 gulp.task("test", function (done) {
     karma.start({
         configFile: __dirname + "/karma.conf.js",
-        singleRun: true
+        singleRun: false
     }, function (exitCode) {
         done(exitCode ? "There are failing unit tests" : undefined);
     });
@@ -81,7 +81,7 @@ gulp.task("autotest", function () {
 
 //Default task
 gulp.task("default", ["clean"], function () {
-    gulp.start("sass", "test_r", "build");
+    gulp.start("sass", "test_r", "build", "lint-client", "lint-test", "autotest");
 });
 
 //Gulp Watch
@@ -89,7 +89,7 @@ gulp.task("watch", function () {
     //watch sass files
     gulp.watch("public/scss/screen.scss", ["sass"]);
     //watch js files
-    gulp.watch("**/*.js", ["build"]);
+    gulp.watch("test/**/*.js", ["test"]);
     //create livereaload
     livereload.listen();
     //watch the files on dist folder

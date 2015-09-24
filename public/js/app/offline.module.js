@@ -17,6 +17,7 @@ define([
                 return localStorage.setItem("contacts", data) || "Could not save";
             }
         },
+
         //load data from localStorage
         loadData: function () {
             var ls = localStorage.getItem("contacts");
@@ -31,12 +32,39 @@ define([
             //make sure that some data is sent
             if (!data) return "Please fill the form";
         },
+
         //delete single contact
-        deleteItem: function () {
+        deleteItem: function (id) {
+            if (!id) return false;
+
+            var toDelItem = this.loadItem(id)[0],
+                data = this.loadData(),
+                that = this;
+
+            data.forEach(function (item) {
+                if (item.id !== toDelItem.id)
+                    that.setData(item);
+            });
+            
+            return true;
         },
+
         //edit single contact
         editItem: function () {
+            if (arguments.length === 0) return false;
+
+            return true;
         },
+
+        loadItem: function (id) {
+            var data = this.loadData();
+
+            return data.filter(function (item) {
+                if (item.id === id.id)
+                    return item;
+            });
+        },
+
         getByType: function (type) {
             if (!type) return false;
 
@@ -54,7 +82,7 @@ define([
     };
 
     var o = new Offline();
+
     //console.log(o.getByType("family")); 
     return Offline;
-
 });
