@@ -74,7 +74,7 @@ define([
                 describe("should return", function () {
                     it("message if no data is set", function () {
                         ls.removeItem("contacts");
-                        expect(offline.loadData()).toEqual("No data Found");
+                        expect(offline.loadData()).toEqual(false);
                     });
                     it("object if data is set", function () {
                         ls.setItem("contacts", mockData);
@@ -137,7 +137,7 @@ define([
                     offline.setData(mockData);
                     expect(offline.getByType("family")).toEqual(jasmine.any(Object));
                 });
-
+                
                 it("should return false if no type is sent", function () {
                     expect(offline.getByType()).toBe(false); 
                 });

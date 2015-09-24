@@ -36,11 +36,16 @@ define([
         deleteContact: function () {
             var removedType = this.model.get("type").toLowerCase(),
                 id = this.model.get("id");
-            //send specifyc param in the url so it will be easier to get the DELETE request fro
-            this.model.destroy({
-                url: "contacts.php/delete/" + id,
-                ID : id
-            });
+
+            if (!offline.loadData() || offline.loadData().length <= 0) {
+                //send specifyc param in the url so it will be easier to get the DELETE request fro
+                this.model.destroy({
+                    url: "contacts.php/delete/" + id,
+                    ID : id
+                });
+            } else {
+                offline.deleteItem({id: id});
+            }
             //remove view from page
             this.remove();
             //if(_.indexOf(contactsView.getTypes(), removedType) === -1) {
@@ -119,7 +124,7 @@ define([
             //initialize the collection with all the entries in the db
             that.collection = new ContactsCollection();
             //if there is no data in localStorage then grab it from the server
-            if (offline.loadData() === "No data Found") {
+            if (offline.loadData().length <= 0 || !offline.loadData()) {
                 //create the GET call grabing all data from DB
                 that.collection.fetch({
                     traditional: true,
@@ -217,7 +222,7 @@ define([
             //reset the collection
             this.collection.reset(this.collection.models, {silent: true});
 
-            if (offline.loadData() === "No data Found") { 
+            if (!offline.loadData()) { 
                 //fetch new data based on filter type
                 this.collection.fetch({
                     traditional: true,
@@ -242,7 +247,7 @@ define([
             }
             //set the route based on type
         },
-       addContact: function (e) {
+        addContact: function (e) {
             e.preventDefault();
             var formData = {}, that = this;
             
