@@ -61,12 +61,21 @@ gulp.task("sass", function () {
         .pipe(notify({message : "Styles completed!"}));
 });
 
-gulp.task("test", function (done) {
+gulp.task("testSingle", function (done) {
+    karma.start({
+        configFile: __dirname + "/karma.conf.js",
+        singleRun: true
+    }, function (exitCode) {
+        done(exitCode ? "There are failing unit tests" : undefined);
+    });
+});
+
+gulp.task("testOn", function (done) {
     karma.start({
         configFile: __dirname + "/karma.conf.js",
         singleRun: false
     }, function (exitCode) {
-        done(exitCode ? "There are failing unit tests" : undefined);
+        done(exitCode ? "Some tests are failiing" : undefined);
     });
 });
 
@@ -75,13 +84,13 @@ gulp.task("clean", function () {
     del(["../dist"]);
 });
 
-gulp.task("autotest", function () {
-    gulp.start("test");
+gulp.task("testOnce", function () {
+    gulp.start("testSingle");
 });
 
 //Default task
 gulp.task("default", ["clean"], function () {
-    gulp.start("sass", "test_r", "build", "lint-client", "lint-test", "autotest");
+    gulp.start("sass", "test_r", "build", "lint-client", "lint-test", "testOnce");
 });
 
 //Gulp Watch
@@ -89,7 +98,7 @@ gulp.task("watch", function () {
     //watch sass files
     gulp.watch("public/scss/screen.scss", ["sass"]);
     //watch js files
-    gulp.watch("test/**/*.js", ["test"]);
+    gulp.watch("test/**/*.js", ["testOn"]);
     //create livereaload
     livereload.listen();
     //watch the files on dist folder
