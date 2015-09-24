@@ -21,40 +21,61 @@ define([
         loadData: function () {
             var ls = localStorage.getItem("contacts");
             if (!ls)
-                return "No data Found";
+                return false;
             else 
-                return JSON.parse(ls);
+                if (JSON.parse(ls).length >= 1)
+                    return JSON.parse(ls);
+                else 
+                    return false;
         },
-
         //save single contact
         saveItem: function (data, callback) {
             //make sure that some data is sent
             if (!data) return "Please fill the form";
         },
         //delete single contact
-        deleteItem: function () {
+        deleteItem: function (id) {
+            if (!id) return false;
+            var toDelItem = this.loadItem(id)[0],
+                data = this.loadData(),
+                newData = [];
+
+            data.forEach(function (item) {
+                if (item.id !== toDelItem.id)
+                    newData.push(item);
+            });
+
+            if (this.setData(JSON.stringify(newData)))
+                return true;
         },
         //edit single contact
         editItem: function () {
+            if (arguments.length === 0) return false;
+            return true;
+        },
+        loadItem: function (id) {
+            var data = this.loadData();
+
+            return data.filter(function (item) {
+                if (item.id === id.id)
+                    return item;
+            });
         },
         getByType: function (type) {
             if (!type) return false;
-
             var data = this.loadData(), items = [];
-
             if (typeof data !== "string")
                 //loop and get only the items that matches the type
                 data.forEach(function (item) {
                     if (type === item.type)
                         items.push(item);
                 });
-
             return items;
         }
     };
 
     var o = new Offline();
+
     //console.log(o.getByType("family")); 
     return Offline;
-
 });

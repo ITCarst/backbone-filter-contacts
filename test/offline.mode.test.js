@@ -2,7 +2,7 @@ define([
     "offline",
     "contactsCollection"
 ], function (Offline, ContactsCollection) {
-    
+
     describe("Offline Module", function () {
         var offline;
 
@@ -14,6 +14,7 @@ define([
         it("should have methods defined", function () {
             expect(offline.setData).toBeDefined();
             expect(offline.loadData).toBeDefined();
+            expect(offline.loadItem).toBeDefined();
             expect(offline.saveItem).toBeDefined();
             expect(offline.deleteItem).toBeDefined();
             expect(offline.editItem).toBeDefined();
@@ -23,6 +24,7 @@ define([
         it("should call the methods", function () {
             spyOn(offline, "setData");
             spyOn(offline, "loadData");
+            spyOn(offline, "loadItem");
             spyOn(offline, "saveItem");
             spyOn(offline, "deleteItem");
             spyOn(offline, "editItem");
@@ -30,6 +32,7 @@ define([
 
             offline.setData();
             offline.loadData();
+            offline.loadItem();
             offline.saveItem();
             offline.saveItem();
             offline.editItem();
@@ -38,6 +41,7 @@ define([
 
             expect(offline.setData).toHaveBeenCalled();
             expect(offline.loadData).toHaveBeenCalled();
+            expect(offline.loadItem).toHaveBeenCalled();
             expect(offline.saveItem).toHaveBeenCalled();
             expect(offline.deleteItem).toHaveBeenCalled();
             expect(offline.editItem).toHaveBeenCalled();
@@ -70,7 +74,7 @@ define([
                 describe("should return", function () {
                     it("message if no data is set", function () {
                         ls.removeItem("contacts");
-                        expect(offline.loadData()).toEqual("No data Found");
+                        expect(offline.loadData()).toEqual(false);
                     });
                     it("object if data is set", function () {
                         ls.setItem("contacts", mockData);
@@ -85,11 +89,47 @@ define([
                 });
             });
 
+            describe("#loadItem", function () {
+                beforeEach(function () {
+                    offline.setData(mockData);
+                });
+                afterEach(function () {
+                    localStorage.removeItem("contacts");
+                });
+
+                it("should return item based on id", function () {
+                    var item = offline.loadItem({id: "3"}),
+                        mockDataItem = JSON.parse(mockData)[0];
+                    expect(item[0]).toEqual(mockDataItem);
+                });
+            });
+
             describe("#editItem", function () {
-               //console.log("edit item test"); 
+                it("should return false if no id is provided", function () {
+                    expect(offline.editItem()).toEqual(false);
+                });
+
+                it("should return updated contact data", function () {
+                    var editedData = '[{"id":"3","name":"edited","address":"1, a street, a town, a city, AB12 3CD","tel":"123456789","type":"family","email":"anemail@me.com"}, {"id":"4","name":"Contact 4","address":"1, a street, a town, a city, AB12 3CD","tel":"123456789","type":"colleagues","email":"anemail@me.com"}, {"id":"5","name":"Contact 5","address":"1, a street, a town, a city, AB12 3CD","tel":"123456789","type":"friends","email":"anemail@me.com"}, {"id":"6","name":"asd","address":"asd","tel":"sad","type":"bla","email":"asd"}]';
+                    expect(offline.editItem(editedData)).toEqual(true);
+                });
             });
 
             describe("#deleteItem", function () {
+                beforeEach(function () {
+                    offline.setData(mockData);
+                });
+                
+                afterEach(function () {
+                    localStorage.removeItem("contacts");
+                });
+
+                it("should return false if no id is sent", function () {
+                    expect(offline.deleteItem()).toBe(false);
+                });
+                it("should delete item based on id", function () {
+                    expect(offline.deleteItem({id: "3"})).toBe(true); 
+                });
             });
 
             describe("#getByType", function () {
@@ -97,7 +137,7 @@ define([
                     offline.setData(mockData);
                     expect(offline.getByType("family")).toEqual(jasmine.any(Object));
                 });
-
+                
                 it("should return false if no type is sent", function () {
                     expect(offline.getByType()).toBe(false); 
                 });

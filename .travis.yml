@@ -5,6 +5,7 @@ before_script:
     - "export DISPLAY=:99.0"
     - "sh -e /etc/init.d/xvfb start"
     - npm install
+    - npm install gulp-notify -g
 script: 
     - gulp
     - ./node_modules/karma/bin/karma start karma.conf.js --browsers Firefox --single-run
