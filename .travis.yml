@@ -8,7 +8,6 @@ before_script:
     - npm install gulp-notify -g
 script: 
     - gulp
-    - ./node_modules/karma/bin/karma start karma.conf.js --browsers Firefox --single-run
 after_script:
     - echo "Build executed!"
 

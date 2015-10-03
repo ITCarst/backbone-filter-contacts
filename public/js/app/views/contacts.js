@@ -263,30 +263,39 @@ define([
                 formData.type = formData.type.toLowerCase();
                 //create new model fomr the filled from
                 var new_contact = new ContactsModel(formData);
-                //save the new contact in db
-                new_contact.save(null, {
-                    rest: true,
-                    success: function (model, resp, options) {
-                        //check if the user added a new type that we don't already have
-                        if (_.indexOf(that.getTypes(), formData.type) === -1) 
-                        {
-                            var selectGroup = that.$el.find("#filter div");
-                            //add the new contact to the collection 
-                            that.collection.add(new_contact);
-                            //remove the types
-                            $(selectGroup).find("a").remove();
-                            //append the new list including the new type
-                            $(selectGroup).append(that.renderSelect());
-
-                        } else {
-                            //add the new contact to the collection 
-                            that.collection.add(new_contact);
+                //save the entry in localStorage
+                if (offline) {
+                    offline.saveItem(formData);
+                    appendFilter();
+                } else {
+                    //save the new contact in db
+                    new_contact.save(null, {
+                        rest: true,
+                        success: function (model, resp, options) {
+                            appendFilter();
+                        },
+                        error : function (model, xhr, options) {
+                            console.log(model, xhr, options);        
                         }
-                    },
-                    error : function (model, xhr, options) {
-                        console.log(model, xhr, options);        
+                    });
+                }
+
+                function appendFilter () {
+                    var selectGroup = that.$el.find("#filter div");
+                    if (_.indexOf(that.getTypes(), formData.type) === -1)  
+                    {
+                        //add the new contact to the collection 
+                        that.collection.add(new_contact);
+                        //remove the types
+                        $(selectGroup).find("a").remove();
+                        //append the new list including the new type
+                        $(selectGroup).append(that.renderSelect());
+                    } else {
+                        console.log("existing type");
+                        //add the new contact to the collection 
+                        that.collection.add(new_contact);
                     }
-                });
+                }
             }
         },
         showForm : function () {
