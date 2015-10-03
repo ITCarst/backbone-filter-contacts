@@ -84,8 +84,20 @@ define([
             });
 
             describe("#saveItem", function () {
+                var item;
+                beforeEach(function () {
+                    item = JSON.parse(mockData)[0];
+                });
                 it("should return string if no data is sent", function () {
-                    expect(offline.saveItem()).toBe("Please fill the form");
+                    expect(offline.saveItem()).toBe("Please fill the form.");
+                });
+                it("should return message if item already exists", function () {
+                    expect(offline.saveItem(item)).toEqual("Item already exists.");
+                });
+                it("should return true if item was saved", function () {
+                    var newItem = item;
+                    newItem.id = "999";
+                    expect(offline.saveItem(newItem)).toEqual("Entry saved."); 
                 });
             });
 
@@ -94,13 +106,10 @@ define([
                     offline.setData(mockData);
                 });
                 afterEach(function () {
-                    localStorage.removeItem("contacts");
+                    ls.removeItem("contacts");
                 });
-
                 it("should return item based on id", function () {
-                    var item = offline.loadItem({id: "3"}),
-                        mockDataItem = JSON.parse(mockData)[0];
-                    expect(item[0]).toEqual(mockDataItem);
+                    expect(offline.loadItem({id: "3"})).toEqual(JSON.parse(mockData)[0]);
                 });
             });
 
@@ -121,7 +130,7 @@ define([
                 });
                 
                 afterEach(function () {
-                    localStorage.removeItem("contacts");
+                    ls.removeItem("contacts");
                 });
 
                 it("should return false if no id is sent", function () {

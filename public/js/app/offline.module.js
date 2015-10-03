@@ -30,15 +30,30 @@ define([
         },
         //save single contact
         saveItem: function (data, callback) {
+            var items = this.loadData();
             //make sure that some data is sent
-            if (!data) return "Please fill the form";
+            if (!data) return "Please fill the form.";
+
+            if (!data.id) {
+                var lastItem = items.slice(-1)[0],
+                    newId = parseInt(lastItem.id) + 1;
+                data.id = newId.toString();
+            }
+            //check if the item already exists in LS
+            if (this.loadItem({id: data.id})) return "Item already exists.";
+            //push the new item to the ls array
+            items.push(data);
+            //set the data with the new item added
+            if (this.setData(JSON.stringify(items)))
+                return "Entry saved.";
+
         },
         //delete single contact
         deleteItem: function (id) {
             if (!id) return false;
-            var toDelItem = this.loadItem(id)[0],
-                data = this.loadData(),
-                newData = [];
+
+            var toDelItem = this.loadItem(id),
+                data = this.loadData(), newData = [];
 
             data.forEach(function (item) {
                 if (item.id !== toDelItem.id)
@@ -55,11 +70,11 @@ define([
         },
         loadItem: function (id) {
             var data = this.loadData();
-
+            //filter the matched id
             return data.filter(function (item) {
                 if (item.id === id.id)
                     return item;
-            });
+            })[0];
         },
         getByType: function (type) {
             if (!type) return false;
