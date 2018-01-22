@@ -1,7 +1,7 @@
 {
-  "name":"backbone-filter-contacts",
-  "description":"",
-  "scripts":{},
-  "env":{},
-  "addons":[]
+  "name": "Backbone Filter Contacts",
+  "description": "A small Backbone application, where you can: add delete edit filter your contacts.",
+  "repository": "https://github.com/IonutC/backbone-filter-contacts",
+  "logo": "http://node-js-sample.herokuapp.com/node.svg",
+  "keywords": ["node", "backbone"]
 }
